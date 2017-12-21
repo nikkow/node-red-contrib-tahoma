@@ -18,10 +18,10 @@
     		return this.name?"node_label_italic":"";
 		},
 		oneditprepare: function generateEditForm() {
-			$("#node-input-device").replaceWith('<select id="node-input-device" name="node-input-device" style="width: 250px;">');
-
 			var valuedevice = $('#node-input-device').val();
 
+			$("#node-input-device").replaceWith('<select id="node-input-device" name="node-input-device" style="width: 250px;">');
+			
 			var deviceRefresh=function(){
 				$.ajax({
 					url: "/tahomasomfy/getSetup/"+ $("#node-input-tahomabox").val(),
@@ -71,7 +71,7 @@
 </script>
 
 <script type="text/x-red" data-help-name="tahoma">
-    <p>A simple node that converts the message payloads into all lower-case characters</p>
+    <p></p>
 </script>
 
 <script type="text/x-red" data-template-name="tahoma-config">
