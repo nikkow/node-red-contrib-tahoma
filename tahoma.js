@@ -41,11 +41,13 @@ module.exports = function(RED) {
 					break;
 				case "customPosition":
 					commandName = "setClosure";
-					parameters = [String(msg.payload.position)];
+					parameters = [msg.payload.position];
 					statusProgressText = "Going to "+ msg.payload.position +"%...";
 					statusDoneText = "Set to "+ msg.payload.position +"%";
 					expectedState = {open: true, position: msg.payload.position};
 			}
+
+
 
 			var command = {};
 			command.name = commandName;
@@ -79,7 +81,19 @@ module.exports = function(RED) {
 
 					tahomalink.continueWhenFinished(node.device, expectedState)
 					.then(function() {
-						node.status({fill: 'green', shape: 'dot', text: statusDoneText});
+						node.status({
+							fill: 'green',
+							shape: 'dot', 
+							text: statusDoneText
+						});
+
+						if(!('payload' in msg)) {
+							msg.payload = {};
+						}
+
+						// TODO: Find a better way to handle "my" position.
+						msg.payload.output = expectedState ? expectedState : {open: true};
+
 						node.send(msg);
 					});
 				});
@@ -101,23 +115,6 @@ module.exports = function(RED) {
 		tahomalink.login(configNode.username, configNode.password)
 		.then(function() {
 			tahomalink.getSetup()
-			.then(function(body) {
-				if(typeof body === "string") {
-					body = JSON.parse(body);
-				}
-
-				res.json(body);
-			});
-		});
-		return;
-	});
-
-	RED.httpAdmin.get('/tahomasomfy/updateState/:node', function(req, res, next){
-		var configNode = RED.nodes.getNode(req.params.boxid);
-
-		tahomalink.login(configNode.username, configNode.password)
-		.then(function() {
-			tahomalink.getDeviceState(req.params.deviceid)
 			.then(function(body) {
 				if(typeof body === "string") {
 					body = JSON.parse(body);
