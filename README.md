@@ -2,7 +2,10 @@
 
 ## Setup
 
-	npm i -g node-red-contrib-tahoma
+You can read this [guide](https://nodered.org/docs/getting-started/adding-nodes) from Node-RED official portal. This will help you install this node. Typically, the command are as follows:
+
+	cd $HOME/.node-red
+	npm install node-red-contrib-tahoma
 	
 ## Disclaimer 
 This software is provided as-is. Be careful: your devices can be totally controlled via API actions. I am not responsible of any mis-usage or corruption of the devices configuration.
