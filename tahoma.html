@@ -21,8 +21,17 @@
 			var valuedevice = $('#node-input-device').val();
 
 			$("#node-input-device").replaceWith('<select id="node-input-device" name="node-input-device" style="width: 250px;">');
-			
-			var deviceRefresh=function(){
+
+			var deviceRefresh = function () {
+				var tahomaBoxValue = $("#node-input-tahomabox").val();
+
+				if(tahomaBoxValue.length <= 0 || tahomaBoxValue === "_ADD_") {
+					$("#node-input-device").empty().prop('disabled', true)
+					return;
+				}
+
+				$("#node-input-device").empty().prop('disabled', false)
+
 				$.ajax({
 					url: "/tahomasomfy/getSetup/"+ $("#node-input-tahomabox").val(),
 					success: function(data) {
@@ -39,6 +48,7 @@
 				});
 			};
 
+			$("#node-input-tahomabox").on('change', deviceRefresh);
 			deviceRefresh()
 		}
     });

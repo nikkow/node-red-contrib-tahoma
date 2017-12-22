@@ -47,8 +47,6 @@ module.exports = function(RED) {
 					expectedState = {open: true, position: msg.payload.position};
 			}
 
-
-
 			var command = {};
 			command.name = commandName;
 			if(parameters.length > 0) {
@@ -83,7 +81,7 @@ module.exports = function(RED) {
 					.then(function() {
 						node.status({
 							fill: 'green',
-							shape: 'dot', 
+							shape: 'dot',
 							text: statusDoneText
 						});
 
