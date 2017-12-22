@@ -1,5 +1,7 @@
 # Somfy Tahoma for Node-RED
 
+**Note:** This module is still under development. It is **not** ready for production usage.
+
 ## Setup
 
 You can read this [guide](https://nodered.org/docs/getting-started/adding-nodes) from Node-RED official portal. This will help you install this node. Typically, the command are as follows:
