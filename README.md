@@ -24,7 +24,7 @@ This node accepts an object as input. The following properties will be parsed:
 | -------- | ---- | --------- | ----------- |
 | `action` | enum (see below) | **Yes** | The action to perform |
 | `position` | int (0-100) | *No* | The position you want to set your blinds/door to |
-| `lowspeed` | boolean | *No* | Should the action be trigerred in lowspeed mode? |
+| `lowspeed` | boolean | *No* | Should the action be trigerred in lowspeed mode? **TODO** |
 
 ### Actions
 
