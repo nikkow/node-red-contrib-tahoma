@@ -41,6 +41,15 @@ The node will output its original `msg.payload` enriched with the result of the 
 
 * `open`: a boolean. Set to true if the device is open, or false othewise
 * `position`: an integer (0-100). Set to the position returned by the Tahoma box. This field is currently not sent when the "my" function is used.
+
+## Compatibility
+
+This was tested with the following devices:
+
+* IO-HomeControl Roller Shutters
+* IO-HomeControl Garage Door
+
+Feel free to send any feedback of any other compatible items or known limitations :)
 	
 ## To-do
 
