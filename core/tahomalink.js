@@ -99,20 +99,23 @@ var getDeviceState = function getDeviceState(deviceURL) {
 
 	return deferred.promise;
 };
-
+var isFirstLaunch = true;
 var continueWhenFinished = function continueWhenFinished(deviceURL, expectedState) {
-	var isFirstLaunch = true;
 	return Q.Promise(function(resolve) {
 		setTimeout(function() {
 			getDeviceState(deviceURL).then(function(state) {
-				var isOpen = state.open === "open";
-				if(isOpen === expectedState.open && state.position === expectedState.position) {
+				console.log(state.position, expectedState.position);
+				// - Checking on the position seems enough for now.
+				//var isOpen = state.open === "open";
+				if(/*isOpen === expectedState.open && */state.position === expectedState.position) {
 					resolve(true);
 				} else {
 					resolve(false);
 				}
 			});
 		}, isFirstLaunch ? 0 : 2000);
+
+		isFirstLaunch = false;
 	})
 	.then(function(finished) {
 		return finished ? true : continueWhenFinished(deviceURL, expectedState);
