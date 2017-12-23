@@ -34,11 +34,11 @@ module.exports = function(RED) {
 					statusDoneText = "Closed";
 					expectedState = {open: false, position: 100};
 					break;
-				case "myPosition":
+				/*case "myPosition":
 					commandName = "my";
 					statusProgressText = "Going to 'my' position...";
 					statusDoneText = "Set to 'my'";
-					break;
+					break;*/
 				case "customPosition":
 					commandName = "setClosure";
 					parameters = [msg.payload.position];
@@ -48,9 +48,14 @@ module.exports = function(RED) {
 			}
 
 			var command = {};
-			command.name = commandName;
+			command.name = msg.payload.lowspeed ? "setClosureAndLinearSpeed" : commandName;
 			if(parameters.length > 0) {
 				command.parameters = parameters;
+			}
+
+			if(msg.payload.lowspeed) {
+				command.parameters = [expectedState.position, "lowspeed"];
+				statusProgressText = statusProgressText.substring(0, (statusProgressText.length - 3)) +" (Low Speed)...";
 			}
 
 			action.commands = [];
