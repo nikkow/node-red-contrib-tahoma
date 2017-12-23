@@ -16,7 +16,7 @@ This software is provided as-is. Be careful: your devices can be totally control
 
 In order to use this node, you need to have a Tahoma Link account. If you already use the Tahoma Box and the mobile apps, you should have one.
 
-When creating your first node, you will be asked to provide your e-mail and password used to login to your Tahoma Link account. These will be used to connect to the API (of course, they will only be used locally, they are not forwaded to me :)).
+When creating your first node, you will be asked to provide your e-mail and password used to login to your Tahoma Link account. These will be used to connect to the API (of course, they will only be used locally, they are not forwarded to me :)).
 
 ## Usage
 
@@ -26,7 +26,7 @@ This node accepts an object as input. The following properties will be parsed:
 | -------- | ---- | --------- | ----------- |
 | `action` | enum (see below) | **Yes** | The action to perform |
 | `position` | int (0-100) | *No* | The position you want to set your blinds/door to |
-| `lowspeed` | boolean | *No* | Should the action be trigerred in lowspeed mode? **TODO** |
+| `lowspeed` | boolean | *No* | Should the action be triggered in low-speed mode? |
 
 ### Actions
 
@@ -40,7 +40,7 @@ Currently, only a few commands are understood by this node. The possible values 
 
 The node will output its original `msg.payload` enriched with the result of the expected action. `msg.payload.output` will contain 2 properties:
 
-* `open`: a boolean. Set to true if the device is open, or false othewise
+* `open`: a boolean. Set to true if the device is open, or false otherwise
 * `position`: an integer (0-100). Set to the position returned by the Tahoma box.
 
 ## Compatibility
