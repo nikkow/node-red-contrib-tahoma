@@ -43,6 +43,12 @@ The node will output its original `msg.payload` enriched with the result of the 
 * `open`: a boolean. Set to true if the device is open, or false otherwise
 * `position`: an integer (0-100). Set to the position returned by the Tahoma box.
 
+## Example flow
+
+![Example Flow](docs/example-flow.png)
+
+An example flow can be found in the docs/ folder. Basically, all it does is close and open shutters based on manual triggers. Those can be replaced by some logic (e.g. a node calculating the sunset and sunrise times). The output is sent to a local MQTT broker. 
+
 ## Compatibility
 
 This was tested with the following devices:
