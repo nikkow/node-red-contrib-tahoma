@@ -49,6 +49,7 @@ This was tested with the following devices:
 
 * IO-HomeControl Roller Shutters
 * IO-HomeControl Garage Door
+* Sunea IO Awning (thanks to @xeor)
 
 Feel free to send any feedback of any other compatible items or known limitations :)
 
