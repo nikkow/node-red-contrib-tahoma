@@ -1,6 +1,8 @@
 # Somfy Tahoma for Node-RED
 
-**Note:** This module is still under development. It is **not** ready for production usage.
+![npm](https://img.shields.io/npm/v/node-red-contrib-tahoma.svg)
+![npm](https://img.shields.io/npm/dt/node-red-contrib-tahoma.svg) 
+![license](https://img.shields.io/github/license/nikkow/node-red-contrib-tahoma.svg)
 
 ## Setup
 
