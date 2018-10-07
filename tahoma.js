@@ -45,6 +45,12 @@ module.exports = function(RED) {
 					statusProgressText = "Going to "+ msg.payload.position +"%...";
 					statusDoneText = "Set to "+ msg.payload.position +"%";
 					expectedState = {open: true, position: msg.payload.position};
+				case "stop":
+					commandName = "stop";
+					statusProgressText = "Stopping...";
+					statusDoneText = "Stoped";
+					//expectedState = {open: false, position: 100}; // Not sure what to exspect here
+					break;
 			}
 
 			var command = {};
