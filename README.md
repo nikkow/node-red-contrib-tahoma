@@ -36,6 +36,7 @@ Currently, only a few commands are understood by this node. The possible values 
 
 * `open`: This will open the device (door, blind...)
 * `close`: This will close the device
+* `stop`: This will stop all running actions
 * `customPosition`: This will set the device to a custom position. The position is passed using the `position` property, which is required in this mode.
 
 ### Output
