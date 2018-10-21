@@ -33,7 +33,7 @@
 				$("#node-input-device").empty().prop('disabled', false)
 
 				$.ajax({
-					url: "/tahomasomfy/getSetup/"+ $("#node-input-tahomabox").val(),
+					url: "tahomasomfy/getSetup/"+ $("#node-input-tahomabox").val(),
 					success: function(data) {
 						if(data.setup === undefined || data.setup.devices === undefined || data.setup.devices.length === 0) {
 							$("#node-input-device").empty().html('<option value="_NO_DEVICE_" selected="selected">No devices found.</option>');
