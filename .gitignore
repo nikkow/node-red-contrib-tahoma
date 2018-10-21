@@ -1,6 +1,9 @@
 
 # Created by https://www.gitignore.io/api/osx,git,node,linux,macos,windows
 
+# Jetbrains files
+.idea
+
 ### Git ###
 *.orig
 
