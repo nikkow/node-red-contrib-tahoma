@@ -88,6 +88,12 @@ var getDeviceState = function getDeviceState(deviceURL) {
 					if(_thisDevice.states[j].name === "core:ClosureState") {
 						response.position = _thisDevice.states[j].value;
 					}
+
+					// - Exposes SunSensor value
+					// - https://github.com/nikkow/node-red-contrib-tahoma/issues/6
+					if(_thisDevice.states[j].name === "core:LuminanceState") {
+						response.luminance = _thisDevice.states[j].value;
+					}
 				}
 
 				return deferred.resolve(response);

@@ -45,6 +45,7 @@ The node will output its original `msg.payload` enriched with the result of the 
 
 * `open`: a boolean. Set to true if the device is open, or false otherwise
 * `position`: an integer (0-100). Set to the position returned by the Tahoma box.
+* `luminance`: in case of a Sun Sensor, returns the current value of core:LuminanceState (See issue [#6](https://github.com/nikkow/node-red-contrib-tahoma/issues/6))
 
 ## Example flow
 
