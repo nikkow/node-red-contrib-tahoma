@@ -111,6 +111,29 @@ module.exports = function(RED) {
     }
     RED.nodes.registerType("tahoma", TahomaNode);
 
+	function TahomaNodeRead(config) {
+		RED.nodes.createNode(this, config);
+
+		this.device = config.device;
+		this.tahomabox = config.tahomabox;
+
+		var node = this;
+		var configNode = RED.nodes.getNode(node.tahomabox);
+
+        node.on('input', function(msg) {
+			tahomalink.login(configNode.username, configNode.password)
+			.then(function() {
+				tahomalink.getDeviceState(node.device)
+				.then(function(data) {
+					console.log(data);
+					msg.payload = data;
+					node.send(msg);
+				});
+			});
+		});
+	}
+	RED.nodes.registerType('tahoma-read', TahomaNodeRead);
+
 	function TahomaConfigNode(n) {
         RED.nodes.createNode(this,n);
         this.username = n.username;
