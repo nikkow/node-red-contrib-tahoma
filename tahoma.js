@@ -78,33 +78,30 @@ module.exports = function(RED) {
 
 			node.status({fill: 'yellow', shape: 'dot', text: statusProgressText});
 
-			tahomalink.login(configNode.username, configNode.password)
-			.then(function() {
-				tahomalink.execute(row)
-				.then(function(body) {
-					if(expectedState === null) {
-						node.status({fill: 'grey', shape: 'dot', text: 'Unknown'});
-						node.send(msg);
-						return;
+			tahomalink.execute(row, configNode)
+			.then(function(body) {
+				if(expectedState === null) {
+					node.status({fill: 'grey', shape: 'dot', text: 'Unknown'});
+					node.send(msg);
+					return;
+				}
+
+				tahomalink.continueWhenFinished(node.device, expectedState)
+				.then(function() {
+					node.status({
+						fill: 'green',
+						shape: 'dot',
+						text: statusDoneText
+					});
+
+					if(!('payload' in msg)) {
+						msg.payload = {};
 					}
 
-					tahomalink.continueWhenFinished(node.device, expectedState)
-					.then(function() {
-						node.status({
-							fill: 'green',
-							shape: 'dot',
-							text: statusDoneText
-						});
+					// TODO: Find a better way to handle "my" position.
+					msg.payload.output = expectedState ? expectedState : {open: true};
 
-						if(!('payload' in msg)) {
-							msg.payload = {};
-						}
-
-						// TODO: Find a better way to handle "my" position.
-						msg.payload.output = expectedState ? expectedState : {open: true};
-
-						node.send(msg);
-					});
+					node.send(msg);
 				});
 			});
         });
@@ -144,16 +141,13 @@ module.exports = function(RED) {
 
 	RED.httpAdmin.get('/tahomasomfy/getSetup/:boxid', function(req, res, next){
 		var configNode = RED.nodes.getNode(req.params.boxid);
-		tahomalink.login(configNode.username, configNode.password)
-		.then(function() {
-			tahomalink.getSetup()
-			.then(function(body) {
-				if(typeof body === "string") {
-					body = JSON.parse(body);
-				}
+		tahomalink.getSetup(configNode)
+		.then(function(body) {
+			if(typeof body === "string") {
+				body = JSON.parse(body);
+			}
 
-				res.json(body);
-			});
+			res.json(body);
 		});
 		return;
 	});

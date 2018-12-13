@@ -25,7 +25,7 @@ var login = function login(username, password) {
 	return deferred.promise;
 };
 
-var getSetup = function getSetup() {
+var getSetup = function getSetup(options) {
 	var deferred = Q.defer();
 
 	request({
@@ -35,6 +35,11 @@ var getSetup = function getSetup() {
 	}, function(err, res, body) {
 		if(res.statusCode === 200) {
 			deferred.resolve(body);
+		} else if(res.statusCode === 401) {
+			setTimeout(function() { 
+				deferred.resolve(login(options.username, options.password)
+				.then(getSetup(options)));
+			}, 1000);
 		} else {
 			deferred.reject();
 		}
@@ -43,7 +48,7 @@ var getSetup = function getSetup() {
 	return deferred.promise;
 };
 
-var execute = function execute(row) {
+var execute = function execute(row, options) {
 	var deferred = Q.defer();
 
 	request({
@@ -55,6 +60,11 @@ var execute = function execute(row) {
 	}, function(err, res, body) {
 		if(res.statusCode === 200) {
 			deferred.resolve(body);
+		} else if(res.statusCode === 401) {
+			setTimeout(function() { 
+				deferred.resolve(login(options.username, options.password)
+				.then(execute(row, options)));
+			}, 1000);
 		} else {
 			deferred.reject();
 		}
@@ -110,7 +120,6 @@ var continueWhenFinished = function continueWhenFinished(deviceURL, expectedStat
 	return Q.Promise(function(resolve) {
 		setTimeout(function() {
 			getDeviceState(deviceURL).then(function(state) {
-				console.log(state.position, expectedState.position);
 				// - Checking on the position seems enough for now.
 				//var isOpen = state.open === "open";
 				if(/*isOpen === expectedState.open && */state.position === expectedState.position) {
