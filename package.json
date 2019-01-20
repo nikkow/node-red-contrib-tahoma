@@ -4,6 +4,7 @@
     "description": "Control a Somfy Tahoma box from Node RED",
     "main": "index.js",
     "scripts": {
+        "pretest": "eslint --ignore-path .gitignore .",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "repository": {
@@ -33,5 +34,9 @@
     "dependencies": {
         "q": "1.5.1",
         "request": "2.87.0"
+    },
+    "devDependencies": {
+        "eslint": "^5.12.1",
+        "eslint-config-strongloop": "^2.1.0"
     }
 }
