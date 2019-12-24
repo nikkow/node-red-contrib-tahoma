@@ -1,42 +1,49 @@
 {
-    "name": "node-red-contrib-tahoma",
-    "version": "1.0.0",
-    "description": "Control a Somfy Tahoma box from Node RED",
-    "main": "index.js",
-    "scripts": {
-        "pretest": "eslint --ignore-path .gitignore .",
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/nikkow/node-red-contrib-tahoma.git"
-    },
-    "keywords": [
-        "node",
-        "red",
-        "node-red",
-        "tahoma",
-        "somfy",
-        "home",
-        "automation"
-    ],
-    "author": "Nicolas Nunge <me@nikkow.eu>",
-    "license": "Apache-2.0",
-    "bugs": {
-        "url": "https://github.com/nikkow/node-red-contrib-tahoma/issues"
-    },
-    "homepage": "https://github.com/nikkow/node-red-contrib-tahoma#readme",
-    "node-red": {
-        "nodes": {
-            "tahoma": "tahoma.js"
-        }
-    },
-    "dependencies": {
-        "q": "1.5.1",
-        "request": "2.87.0"
-    },
-    "devDependencies": {
-        "eslint": "^5.12.1",
-        "eslint-config-strongloop": "^2.1.0"
+  "name": "node-red-contrib-tahoma",
+  "version": "2.0.0",
+  "description": "Control a Somfy Tahoma box from Node RED",
+  "main": "index.js",
+  "scripts": {
+    "build": "mkdir -p dist/nodes/ && cp -a src/nodes/*.html dist/nodes/ && tsc ",
+    "execute": "npm run build && node-red",
+    "pretest": "eslint --ignore-path .gitignore .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nikkow/node-red-contrib-tahoma.git"
+  },
+  "keywords": [
+    "node",
+    "red",
+    "node-red",
+    "tahoma",
+    "somfy",
+    "home",
+    "automation"
+  ],
+  "author": "Nicolas Nunge <me@nikkow.eu>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/nikkow/node-red-contrib-tahoma/issues"
+  },
+  "homepage": "https://github.com/nikkow/node-red-contrib-tahoma#readme",
+  "node-red": {
+    "nodes": {
+      "tahoma": "dist/nodes/tahoma.js",
+      "tahoma-config": "dist/nodes/tahoma-config.js",
+      "tahoma-read": "dist/nodes/tahoma-read.js"
     }
+  },
+  "dependencies": {
+    "q": "1.5.1",
+    "request": "2.88.0"
+  },
+  "devDependencies": {
+    "@types/node": "^11.12.1",
+    "@types/node-red": "^0.17.3",
+    "eslint": "^6.8.0",
+    "eslint-config-strongloop": "^2.1.0",
+    "typescript": "3.3.1"
+  }
 }
