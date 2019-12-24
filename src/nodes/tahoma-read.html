@@ -1,0 +1,67 @@
+<script type="text/javascript">
+    RED.nodes.registerType('tahoma-read',{
+        category: 'function',
+        color: '#E2D96E',
+		defaults: {
+		   tahomabox: {value:"", type:"tahoma-config"},
+		   name: {value: ""},
+		   device: {value: ""}
+		},
+        inputs: 1,
+        outputs: 1,
+        icon: "bridge-dash.png",
+        label: function() {
+            return this.name || "Tahoma Readable Element";
+        },
+		labelStyle: function() {
+    		return this.name?"node_label_italic":"";
+		},
+		oneditprepare: function generateEditForm() {
+			/*var valuedevice = $('#node-input-device').val();
+			$("#node-input-device").replaceWith('<select id="node-input-device" name="node-input-device" style="width: 250px;">');
+			var deviceRefresh = function () {
+				var tahomaBoxValue = $("#node-input-tahomabox").val();
+				if(tahomaBoxValue.length <= 0 || tahomaBoxValue === "_ADD_") {
+					$("#node-input-device").empty().prop('disabled', true)
+					return;
+				}
+				$("#node-input-device").empty().prop('disabled', false)
+				$.ajax({
+					url: "tahomasomfy/getSetup/"+ $("#node-input-tahomabox").val(),
+					success: function(data) {
+						if(data.setup === undefined || data.setup.devices === undefined || data.setup.devices.length === 0) {
+							$("#node-input-device").empty().html('<option value="_NO_DEVICE_" selected="selected">No devices found.</option>');
+						} else {
+							var html = "";
+							$.each( data.setup.devices, function( key, value ) {
+								html += '<option value="'+ value.deviceURL +'">['+ value.uiClass +'] - '+value.label+'</option>';
+							});
+							$("#node-input-device").empty().html(html).val(valuedevice);
+						}
+					}
+				});
+			};
+			$("#node-input-tahomabox").on('change', deviceRefresh);
+			deviceRefresh()*/
+		}
+    });
+</script>
+
+<script type="text/x-red" data-template-name="tahoma-read">
+	<div class="form-row">
+		<label for="node-input-name"><i class="icon-tag"></i> Name</label>
+		<input type="text" id="node-input-name">
+	</div>
+	<div class="form-row">
+        <label for="node-input-tahomabox"><i class="icon-tag"></i> Tahoma Box</label>
+        <input type="text" id="node-input-tahomabox">
+    </div>
+	<div class="form-row">
+        <label for="node-input-device"><i class="icon-tag"></i> Device</label>
+		<input type="text" id="node-input-device">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="tahoma-read">
+    <p>Reads the current position/value of a given Tahoma controllable device.</p>
+</script>

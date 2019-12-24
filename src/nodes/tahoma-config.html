@@ -1,0 +1,83 @@
+<script type="text/javascript">
+    function handleOAuthCode(code) {
+        const API_KEY = $("#node-config-input-apikey").val();
+        const API_SECRET = $("#node-config-input-apisecret").val();
+        const CALLBACK = window.location.protocol + '//'+ window.location.host + window.location.pathname + 'somfy/callback';
+        const URL = 'https://accounts.somfy.com/oauth/oauth/v2/token?client_id='+ API_KEY +'&client_secret='+ API_SECRET +
+        '&grant_type=authorization_code&code='+ code +'&redirect_uri='+ CALLBACK +'&state=setup';
+
+        $.getJSON(URL).then(function(authenticationResponse) {
+            $(".api-credentials").hide();
+            $(".api-credentials-ok").show();
+            $("#node-config-input-accesstoken").val(authenticationResponse.access_token);
+            $("#node-config-input-refreshtoken").val(authenticationResponse.refresh_token);
+        });
+    }
+
+	RED.nodes.registerType('tahoma-config',{
+        category: 'config',
+        defaults: {
+            connectionname: {required: true},
+            apikey: {required:true},
+            apisecret: {required:true},
+            accesstoken: {required: true},
+            refreshtoken: {required: true}
+        },
+		label: function() {
+			return this.connectionname;
+        },
+        oneditprepare: function tahomaConfigEditPrepare() {
+            if(this.apikey && this.apisecret) {
+                $(".api-credentials").hide();
+                $(".api-credentials-ok").show();
+            } else {
+                $("api-credentials").show();
+                $(".api-credentials-ok").hide();
+            }
+
+            $("#api-credentials-edit").on('click', function() {
+                $(".api-credentials").show();
+                $(".api-credentials-ok").hide();
+            })
+
+            $("#api-link").on('click', function() {
+                const API_KEY = $("#node-config-input-apikey").val();
+                const API_SECRET = $("#node-config-input-apisecret").val();
+                const CALLBACK = window.location.protocol + '//'+ window.location.host + window.location.pathname + 'somfy/callback';
+                var url = "https://accounts.somfy.com/oauth/oauth/v2/auth?response_type=code&client_id="+ API_KEY +"&redirect_uri="+ CALLBACK +"&state=setup&grant_type=authorization_code";
+                window.open(url, "_somfy_oauth_popup", "menubar=no, status=no, scrollbars=no, menubar=no, width=600, height=600");
+            });
+        }
+    });
+</script>
+<script type="text/x-red" data-template-name="tahoma-config">
+    <p>In order to properly configure your Tahoma nodes, you need to be registered on the <a href="https://developer.somfy.com" target="_blank">Somfy developer portal</a> and have an active application.</p>
+    <p>An online documentation is available <a href="#">here</a>.</p>
+
+    <div class="form-row">
+        <label for="node-config-input-connectionname"><i class="icon-bookmark"></i> Name:</label>
+        <input type="text" id="node-config-input-connectionname">
+    </div>
+    <div class="form-row api-credentials">
+        <label for="node-config-input-apikey"><i class="icon-bookmark"></i> API Key:</label>
+        <input type="text" id="node-config-input-apikey">
+    </div>
+    <div class="form-row api-credentials">
+        <label for="node-config-input-apisecret"><i class="icon-bookmark"></i> API Secret:</label>
+        <input type="text" id="node-config-input-apisecret">
+    </div>
+
+    <button class="api-credentials" id="api-link">Link Node-Red to Tahoma</button>
+
+    <div class="api-credentials-ok">
+        You have already setup your API credentials. Click <a href="#" id="api-credentials-edit">here</a> if you want to edit them.
+    </div>
+    <div class="form-row api-credentials-ok">
+        <label for="node-config-input-accesstoken"><i class="icon-bookmark"></i> Access Token:</label>
+        <input type="text" id="node-config-input-accesstoken" readonly="readonly">
+    </div>
+    <div class="form-row api-credentials-ok">
+        <label for="node-config-input-refreshtoken"><i class="icon-bookmark"></i> Refresh Token:</label>
+        <input type="text" id="node-config-input-refreshtoken" readonly="readonly">
+    </div>
+</script>
