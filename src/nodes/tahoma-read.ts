@@ -3,10 +3,11 @@ import * as request from 'request';
 
 export = (RED: Red) => {
     RED.nodes.registerType('tahoma-read', function(this, props) {
-        const config = props as any;
+        const config = props as any; // TODO: Handle this differently
         RED.nodes.createNode(this, config);
 
         this.device = config.device;
+        this.site = config.site;
 		this.tahomabox = config.tahomabox;
 
         this.on('input', (msg) => {
