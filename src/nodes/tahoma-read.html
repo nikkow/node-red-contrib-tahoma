@@ -1,22 +1,89 @@
 <script type="text/javascript">
-    RED.nodes.registerType('tahoma-read',{
-        category: 'function',
-        color: '#E2D96E',
+	RED.nodes.registerType('tahoma-read', {
+		category: 'function',
+		color: '#E2D96E',
 		defaults: {
-		   tahomabox: {value:"", type:"tahoma-config"},
-		   name: {value: ""},
-		   device: {value: ""}
+			tahomabox: { value: "", type: "tahoma-config" },
+			name: { value: "" },
+			site: { value: "" },
+			device: { value: "" }
 		},
-        inputs: 1,
-        outputs: 1,
-        icon: "bridge-dash.png",
-        label: function() {
-            return this.name || "Tahoma Readable Element";
-        },
-		labelStyle: function() {
-    		return this.name?"node_label_italic":"";
+		inputs: 1,
+		outputs: 1,
+		icon: "bridge-dash.png",
+		label: function () {
+			return this.name || "Tahoma Readable Element";
+		},
+		labelStyle: function () {
+			return this.name ? "node_label_italic" : "";
 		},
 		oneditprepare: function generateEditForm() {
+			var selected_site = $("#node-input-site").val();
+			var selected_device = $("#node-input-device").val();
+
+			$("#node-input-device").replaceWith('<select id="node-input-device" name="node-input-device" style="width: 250px;">');
+			$("#node-input-site").replaceWith('<select id="node-input-site" name="node-input-site" style="width: 250px;">');
+
+			var loadSites = function() {
+				const tahoma_account_id = $("#node-input-tahomabox").val().trim();
+				if(tahoma_account_id === '_ADD_') {
+					$("#node-input-site").empty().html('<option value="_NO_SITE_" selected="selected">No sites found.</option>');
+					return;
+				}
+
+				$.get('/somfy/' + tahoma_account_id + '/sites').then(function(sites, statusCode) {
+					if(!sites || sites.length === 0) {
+						$("#node-input-site").empty().html('<option value="_NO_SITE_" selected="selected">No sites found.</option>');
+						return;
+					}
+
+					var html = '';
+					$.each(sites, function( key, value ) {
+						var selected = (value.id === selected_site) ? 'selected="selected"' : '';
+						html += '<option value="'+ value.id +'"'+ selected +'>'+value.label+'</option>';
+					});
+					$("#node-input-site").empty().html(html);
+					$("#node-input-site").prop('disabled', false);
+					loadDevices();
+				});
+			}
+
+			var loadDevices = function() {
+				const tahoma_account_id = $("#node-input-tahomabox").val();
+				if(tahoma_account_id === '_ADD_') {
+					$("#node-input-device").empty().html('<option value="_NO_DEVICE_" selected="selected">No devices found.</option>');
+					return;
+				}
+				const tahoma_site_id = $("#node-input-site").val();
+				if(tahoma_site_id === '_NO_SITE_') {
+					$("#node-input-device").empty().html('<option value="_NO_DEVICE_" selected="selected">No devices found.</option>');
+					return;
+				}
+
+				$.get('/somfy/' + tahoma_account_id + '/site/'+ tahoma_site_id +'/devices').then(function(devices, statusCode) {
+					if(!devices || devices.length === 0) {
+						$("#node-input-device").empty().html('<option value="_NO_DEVICE_" selected="selected">No devices found.</option>');
+						return;
+					}
+
+					var html = '';
+
+					$.each(devices, function( key, value ) {
+						if(value && value.name) {
+							var selected = (value.id === selected_device) ? 'selected="selected"' : '';
+							html += '<option value="'+ value.id +'"'+ selected +'>'+value.name+'</option>';
+						}
+					});
+
+					$("#node-input-device").empty().html(html);
+					$("#node-input-device").prop('disabled', false);
+				});
+			}
+
+			$("#node-input-tahomabox").on('change', loadSites);
+			$("#node-input-site").on('change', loadDevices);
+			loadSites();
+
 			/*var valuedevice = $('#node-input-device').val();
 			$("#node-input-device").replaceWith('<select id="node-input-device" name="node-input-device" style="width: 250px;">');
 			var deviceRefresh = function () {
@@ -44,7 +111,7 @@
 			$("#node-input-tahomabox").on('change', deviceRefresh);
 			deviceRefresh()*/
 		}
-    });
+	});
 </script>
 
 <script type="text/x-red" data-template-name="tahoma-read">
@@ -55,7 +122,11 @@
 	<div class="form-row">
         <label for="node-input-tahomabox"><i class="icon-tag"></i> Tahoma Box</label>
         <input type="text" id="node-input-tahomabox">
-    </div>
+	</div>
+	<div class="form-row">
+		<label for="node-input-site"><i class="icon-tag"></i> Site</label>
+		<input type="text" id="node-input-site">
+	</div>
 	<div class="form-row">
         <label for="node-input-device"><i class="icon-tag"></i> Device</label>
 		<input type="text" id="node-input-device">

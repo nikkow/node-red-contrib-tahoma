@@ -7,7 +7,7 @@ export = (RED: Red) => {
         RED.nodes.createNode(this, props);
         this.apikey = props.apikey;
         this.apisecret = props.apisecret;
-        this.acesstoken = props.accesstoken;
+        this.accesstoken = props.accesstoken;
         this.refreshtoken = props.refreshtoken;
     });
 };
