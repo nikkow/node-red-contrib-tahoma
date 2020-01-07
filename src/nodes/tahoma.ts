@@ -126,8 +126,7 @@ export = (RED: Red) => {
                             msg.payload = {};
                         }
 
-                        // TODO: Find a better way to handle "my" position.
-                        msg.payload.output = expectedState ? expectedState : { open: true };
+                        msg.payload.output = expectedState || { open: true };
 
                         this.send(msg);
                     });

@@ -1,6 +1,7 @@
 import { SomfyApi } from '../core/somfy-api';
 import { NodeProperties, Red } from 'node-red';
 import { INodeConfiguration } from '../interfaces/node-config';
+import { IMessage } from '../interfaces/message';
 
 export = (RED: Red) => {
     RED.nodes.registerType('tahoma-read', function (this, props) {
@@ -12,14 +13,14 @@ export = (RED: Red) => {
         this.site = config.site;
         this.tahomabox = config.tahomabox;
 
-        this.on('input', (msg) => {
+        this.on('input', (msg: IMessage) => {
             const somfyApiClient = new SomfyApi(RED, this.context, this.tahomabox);
             somfyApiClient.getDevice(this.device)
                 .then((deviceData) => {
                     msg.payload = deviceData;
                     this.send(msg);
                 })
-                .catch((error) => {
+                .catch(() => {
                     msg.payload = null;
                     this.send(msg);
                 });
