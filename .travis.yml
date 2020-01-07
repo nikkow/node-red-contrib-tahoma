@@ -1,11 +1,6 @@
 language: node_js
-
-before_script:
-  - npm install
-
+node_js:
+  - lts/*
 script:
-  - npm run test
-  - npm run build
-
-after_success:
-  - npm pack
+  - "npm run lint"
+  - "npm run build"
