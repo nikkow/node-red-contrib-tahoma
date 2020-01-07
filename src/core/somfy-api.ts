@@ -15,7 +15,7 @@ export class SomfyApi {
 
         const configNode = this.RED.nodes.getNode(account) as any; // TODO: Type this
 
-        axios.defaults.headers.common["Authorization"] = `Bearer ${this.getAccessToken()}`;
+        axios.defaults.headers.common['Authorization'] = `Bearer ${this.getAccessToken()}`;
 
         axios.interceptors.response.use(
             (response: AxiosResponse) => {
@@ -26,13 +26,21 @@ export class SomfyApi {
                     return Promise.reject(error);
                 }
 
-                return axios
-                    .get(SomfyApi.SOMFY_AUTH_URL + '/token?client_id='+ configNode.apikey +'&client_secret='+ configNode.apisecret +'&grant_type=refresh_token&refresh_token=' + this.getRefreshToken())
+                return axios({
+                        url: `${SomfyApi.SOMFY_AUTH_URL}/token`,
+                        method: 'GET',
+                        params: {
+                            client_id: configNode.apikey,
+                            client_secret: configNode.apisecret,
+                            grant_type: 'refresh_token',
+                            refresh_token: this.getRefreshToken()
+                        }
+                    })
                     .then(response => {
                         this.context().global.set('somfy_api_access_token', response.data.access_token);
                         this.context().global.set('somfy_api_refresh_token', response.data.refresh_token);
 
-                        axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.access_token}`;
+                        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.access_token}`;
 
                         error.hasRefreshedToken = true;
                         return Promise.reject(error);
@@ -50,8 +58,8 @@ export class SomfyApi {
 
                 return response.data;
             })
-            .catch((error: INetworkError) => {              
-                return error.hasRefreshedToken ? this._request(options) : Promise.reject(error)
+            .catch((error: INetworkError) => {
+                return error.hasRefreshedToken ? this._request(options) : Promise.reject(error);
             });
     }
 
@@ -67,7 +75,7 @@ export class SomfyApi {
         return this._request({
             url: `${SomfyApi.SOMFY_BASE_URL}/device/${device}`,
             method: 'GET'
-        })
+        });
     }
 
     public getSites(): Promise<any> {
@@ -92,6 +100,6 @@ export class SomfyApi {
                 'Content-Type': 'application/json'
             },
             data: command
-        })
+        });
     }
 }

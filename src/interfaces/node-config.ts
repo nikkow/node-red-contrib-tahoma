@@ -1,5 +1,5 @@
 export interface INodeConfiguration {
-    device: string,
-    tahomabox: string,
-    site: string
+    device: string;
+    tahomabox: string;
+    site: string;
 }

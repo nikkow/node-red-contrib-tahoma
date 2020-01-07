@@ -1,4 +1,4 @@
-import { NodeProperties, Red } from 'node-red';
+import { Red } from 'node-red';
 import * as fs from 'fs';
 import { ICommand } from '../interfaces/command';
 import { SomfyApi } from '../core/somfy-api';
@@ -9,13 +9,13 @@ export = (RED: Red) => {
     const timerRetries = {};
     const waitUntilExpectedState = (account, device, expectedState, jobId): Promise<any> => {
         return new Promise((resolve) => {
-            var configNode = RED.nodes.getNode(account) as any;
+            const configNode = RED.nodes.getNode(account) as any;
             const somfyApiClient = new SomfyApi(RED, configNode.context, account);
 
             setTimeout(() => {
                 somfyApiClient.getDevice(device)
                     .then((deviceState: any) => { // TODO: Type that
-                        const currentPosition = parseInt(deviceState.states.find(state => state.name === "position").value);
+                        const currentPosition = parseInt(deviceState.states.find(state => state.name === 'position').value, 10);
 
                         if (currentPosition === expectedState.position) {
                             return resolve({ finished: true });
@@ -35,9 +35,10 @@ export = (RED: Red) => {
                 timerRetries[response.jobId] = 1;
             }
 
-            return response.finished ? true : waitUntilExpectedState(response.tahomabox, response.device, response.expectedState, response.jobId)
+            return response.finished ?
+                true : waitUntilExpectedState(response.tahomabox, response.device, response.expectedState, response.jobId);
         });
-    }
+    };
 
     RED.nodes.registerType('tahoma', function (this, props) {
         const config = props as any; // TODO: Handle this differently
@@ -48,55 +49,55 @@ export = (RED: Red) => {
         this.tahomabox = config.tahomabox;
 
         this.on('input', (msg) => {
-            if (typeof msg.payload !== "object") {
+            if (typeof msg.payload !== 'object') {
                 return;
             }
 
-            var action: any = {}; // TODO: Type this.
+            const action: any = {}; // TODO: Type this.
             action.deviceURL = this.device;
 
-            var commandName = "";
-            var parameters = [];
-            var statusProgressText = "";
-            var statusDoneText = "";
-            var expectedState = null;
+            let commandName = '';
+            let parameters = [];
+            let statusProgressText = '';
+            let statusDoneText = '';
+            let expectedState = null;
 
             switch (msg.payload.action) {
-                case "open":
-                    commandName = "open";
-                    statusProgressText = "Opening...";
-                    statusDoneText = "Open";
+                case 'open':
+                    commandName = 'open';
+                    statusProgressText = 'Opening...';
+                    statusDoneText = 'Open';
                     expectedState = { open: true, position: 0 };
                     break;
-                case "close":
-                    commandName = "close";
-                    statusProgressText = "Closing...";
-                    statusDoneText = "Closed";
+                case 'close':
+                    commandName = 'close';
+                    statusProgressText = 'Closing...';
+                    statusDoneText = 'Closed';
                     expectedState = { open: false, position: 100 };
                     break;
-                case "customPosition":
-                    commandName = "position";
-                    parameters = [{ name: "position", value: parseInt(msg.payload.position) }];
-                    statusProgressText = "Going to " + msg.payload.position + "%...";
-                    statusDoneText = "Set to " + msg.payload.position + "%";
+                case 'customPosition':
+                    commandName = 'position';
+                    parameters = [{ name: 'position', value: parseInt(msg.payload.position, 10) }];
+                    statusProgressText = 'Going to ' + msg.payload.position + '%...';
+                    statusDoneText = 'Set to ' + msg.payload.position + '%';
                     expectedState = { open: true, position: msg.payload.position };
                     break;
-                case "stop":
-                    commandName = "stop";
-                    statusProgressText = "Stopping...";
-                    statusDoneText = "Stopped";
-                    //expectedState = {open: false, position: 100}; // Not sure what to exspect here
+                case 'stop':
+                    commandName = 'stop';
+                    statusProgressText = 'Stopping...';
+                    statusDoneText = 'Stopped';
+                    // expectedState = {open: false, position: 100}; // Not sure what to exspect here
                     break;
             }
 
-            var command: ICommand = {
-                name: msg.payload.lowspeed ? "setClosureAndLinearSpeed" : commandName,
+            const command: ICommand = {
+                name: msg.payload.lowspeed ? 'setClosureAndLinearSpeed' : commandName,
                 parameters: parameters || []
             };
 
             if (msg.payload.lowspeed) {
-                command.parameters = [expectedState.position, "lowspeed"];
-                statusProgressText = statusProgressText.substring(0, (statusProgressText.length - 3)) + " (Low Speed)...";
+                command.parameters = [expectedState.position, 'lowspeed'];
+                statusProgressText = statusProgressText.substring(0, (statusProgressText.length - 3)) + ' (Low Speed)...';
             }
 
             this.status({ fill: 'yellow', shape: 'dot', text: statusProgressText });
@@ -128,7 +129,7 @@ export = (RED: Red) => {
                         msg.payload.output = expectedState ? expectedState : { open: true };
 
                         this.send(msg);
-                    })
+                    });
                 });
         });
     });
