@@ -4,7 +4,8 @@ import { INodeConfiguration } from '../interfaces/node-config';
 
 export = (RED: Red) => {
     RED.nodes.registerType('tahoma-read', function (this, props) {
-        const config: INodeConfiguration = props as unknown as INodeConfiguration; // TODO: Handle this differently
+        // TODO: The two typings below are quite ugly, but this is the only way I managed to properly cast them.
+        const config: INodeConfiguration = props as unknown as INodeConfiguration;
         RED.nodes.createNode(this, (config as unknown as NodeProperties));
 
         this.device = config.device;

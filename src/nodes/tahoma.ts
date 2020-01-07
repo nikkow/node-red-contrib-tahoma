@@ -3,6 +3,7 @@ import { ICommand } from '../interfaces/command';
 import { SomfyApi } from '../core/somfy-api';
 import { ICommandExecutionResponse } from '../interfaces/command-execution-response';
 import { IDevice, IDeviceState } from '../interfaces/device';
+import { IMessage } from '../interfaces/message';
 
 
 export = (RED: Red) => {
@@ -14,7 +15,7 @@ export = (RED: Red) => {
 
             setTimeout(() => {
                 somfyApiClient.getDevice(device)
-                    .then((deviceState: IDevice) => { // TODO: Type that
+                    .then((deviceState: IDevice) => {
                         const currentPosition = parseInt(
                             deviceState.states.find((state: IDeviceState) => state.name === 'position').value
                         , 10);
@@ -50,7 +51,7 @@ export = (RED: Red) => {
         this.site = config.site;
         this.tahomabox = config.tahomabox;
 
-        this.on('input', (msg) => { // TODO: Type msg
+        this.on('input', (msg: IMessage) => {
             if (typeof msg.payload !== 'object') {
                 return;
             }
