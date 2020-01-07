@@ -1,28 +1,27 @@
 import { NodeProperties, Red } from 'node-red';
-import * as request from 'request';
+import { INodeConfiguration } from '../interfaces/node-config';
+import { SomfyApi } from '../core/somfy-api';
 
 export = (RED: Red) => {
     RED.nodes.registerType('tahoma-read', function(this, props) {
-        const config = props as any; // TODO: Handle this differently
-        RED.nodes.createNode(this, config);
+        const config: INodeConfiguration = props as unknown as INodeConfiguration; // TODO: Handle this differently
+        RED.nodes.createNode(this, (config as unknown as NodeProperties));
 
         this.device = config.device;
         this.site = config.site;
 		this.tahomabox = config.tahomabox;
 
         this.on('input', (msg) => {
-            var configNode = RED.nodes.getNode(this.tahomabox) as any;
-            request({
-                url: 'https://api.somfy.com/api/v1/device/' + this.device,
-                method: 'GET',
-                headers: {
-                    'Authorization': 'Bearer ' + configNode.accesstoken
-                }
-            }, (err, response, data) => {
-                // TODO: Handle errors properly and token refresh
-                msg.payload = JSON.parse(data);
-                this.send(msg);
-            });
+            const somfyApiClient = new SomfyApi(RED, this.context, this.tahomabox);
+            somfyApiClient.getDevice(this.device)
+                .then((deviceData) => {
+                    msg.payload = deviceData;
+                    this.send(msg);
+                })
+                .catch((error) => {
+                    msg.payload = null;
+                    this.send(msg);
+                });
 		});
     });
 };

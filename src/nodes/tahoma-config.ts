@@ -9,5 +9,8 @@ export = (RED: Red) => {
         this.apisecret = props.apisecret;
         this.accesstoken = props.accesstoken;
         this.refreshtoken = props.refreshtoken;
+
+        this.context().global.set('somfy_api_access_token', this.accesstoken);
+        this.context().global.set('somfy_api_refresh_token', this.refreshtoken);
     });
 };

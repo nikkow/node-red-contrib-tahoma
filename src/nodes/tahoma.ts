@@ -1,48 +1,34 @@
 import { NodeProperties, Red } from 'node-red';
 import * as fs from 'fs';
-import * as request from 'request';
+import { ICommand } from '../interfaces/command';
+import { SomfyApi } from '../core/somfy-api';
+import { ICommandExecutionResponse } from '../interfaces/command-execution-response';
 
 
 export = (RED: Red) => {
     const timerRetries = {};
-    const waitUntilExpectedState = (tahomabox, device, expectedState, jobId): Promise<any> => {
+    const waitUntilExpectedState = (account, device, expectedState, jobId): Promise<any> => {
         return new Promise((resolve) => {
-            var configNode = RED.nodes.getNode(tahomabox) as any;
+            var configNode = RED.nodes.getNode(account) as any;
+            const somfyApiClient = new SomfyApi(RED, configNode.context, account);
+
             setTimeout(() => {
                 console.log('Calling API...');
-                request({
-                    url: 'https://api.somfy.com/api/v1/device/' + device,
-                    method: 'GET',
-                    headers: {
-                        'Authorization': 'Bearer ' + configNode.accesstoken
-                    }
-                }, (err, response, data) => {
-                    if (response.statusCode === 200) {
-                        try {
-                            const deviceState = JSON.parse(data);
-                            const currentPosition = parseInt(deviceState.states.find(state => state.name === "position").value);
+                somfyApiClient.getDevice(device)
+                    .then((deviceState: any) => { // TODO: Type that
+                        const currentPosition = parseInt(deviceState.states.find(state => state.name === "position").value);
 
-                            console.log('Current position => ', currentPosition)
-                            console.log('Expected position => ', expectedState.position)
-                            console.log('Is Finished? => ', (currentPosition === expectedState.position));
-
-                            if (currentPosition === expectedState.position) {
-                                console.log('Return resolve(true);')
-                                return resolve({finished: true});
-                            } else {
-                                return resolve({finished: false, tahomabox, device, expectedState});
-                            }
-                        } catch {
-                            return resolve({finished: false, tahomabox, device, expectedState});
+                        if (currentPosition === expectedState.position) {
+                            console.log('Return resolve(true);')
+                            return resolve({ finished: true });
                         }
-                    }
 
-                    return resolve({finished: false, tahomabox, device, expectedState});
-                });
+                        return resolve({ finished: false, account, device, expectedState });
+                    });
             }, 10000);
-        }).then((response: {finished: boolean, tahomabox?: string, device?: string, expectedState?: object, jobId?: string}) => {
-            if(timerRetries.hasOwnProperty(response.jobId)) {
-                if(timerRetries[response.jobId] === 3 && !response.finished) {
+        }).then((response: { finished: boolean, tahomabox?: string, device?: string, expectedState?: object, jobId?: string }) => {
+            if (timerRetries.hasOwnProperty(response.jobId)) {
+                if (timerRetries[response.jobId] === 3 && !response.finished) {
                     return false;
                 }
 
@@ -92,7 +78,7 @@ export = (RED: Red) => {
                     break;
                 case "customPosition":
                     commandName = "position";
-                    parameters = [{name: "position", value: parseInt(msg.payload.position)}];
+                    parameters = [{ name: "position", value: parseInt(msg.payload.position) }];
                     statusProgressText = "Going to " + msg.payload.position + "%...";
                     statusDoneText = "Set to " + msg.payload.position + "%";
                     expectedState = { open: true, position: msg.payload.position };
@@ -105,45 +91,30 @@ export = (RED: Red) => {
                     break;
             }
 
-            var command: any = {}; // TODO: Type this
-
-            command.name = msg.payload.lowspeed ? "setClosureAndLinearSpeed" : commandName;
-            if (parameters.length > 0) {
-                command.parameters = parameters;
-            } else {
-                command.parameters = [];
-            }
+            var command: ICommand = {
+                name: msg.payload.lowspeed ? "setClosureAndLinearSpeed" : commandName,
+                parameters: parameters || []
+            };
 
             if (msg.payload.lowspeed) {
                 command.parameters = [expectedState.position, "lowspeed"];
                 statusProgressText = statusProgressText.substring(0, (statusProgressText.length - 3)) + " (Low Speed)...";
             }
 
-            var configNode = RED.nodes.getNode(this.tahomabox) as any; // TODO: Type this
-
             this.status({ fill: 'yellow', shape: 'dot', text: statusProgressText });
 
-            console.log('Command => ', JSON.stringify(command));
+            const somfyApiClient = new SomfyApi(RED, this.context, this.tahomabox);
 
-            request({
-                url: 'https://api.somfy.com/api/v1/device/' + this.device + '/exec',
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + configNode.accesstoken,
-                    'Content-Type': 'application/json'
-                },
-                json: command
-            }, (err, response, data) => {
-                if(!err && response.statusCode === 200) {
-                    if (expectedState === null) {
+            somfyApiClient.sendCommandToDevice(this.device, command)
+                .then((commandExecutionFeedback: ICommandExecutionResponse) => {
+                    if (!expectedState) {
                         this.status({ fill: 'grey', shape: 'dot', text: 'Unknown' });
                         this.send(msg);
                         return;
                     }
 
-                    console.log('Data => ', data);
-                    const jobId = data.job_id; // TODO: Fix that
-    
+                    const jobId = commandExecutionFeedback.job_id;
+
                     waitUntilExpectedState(this.tahomabox, this.device, expectedState, jobId).then((isFinished) => {
                         console.log('Finished - Callback');
                         this.status({
@@ -151,24 +122,17 @@ export = (RED: Red) => {
                             shape: 'dot',
                             text: statusDoneText
                         });
-    
+
                         if (!('payload' in msg)) {
                             msg.payload = {};
                         }
-    
+
                         // TODO: Find a better way to handle "my" position.
                         msg.payload.output = expectedState ? expectedState : { open: true };
-    
+
                         this.send(msg);
                     })
-                } else {
-                    console.log('Err => ', err);
-                    console.log('Data => ', data);
-                    this.status({ fill: 'red', shape: 'dot', text: 'An error occurred' });
-                    this.send(null);
-                    return;
-                }
-            });
+                });
         });
     });
 
@@ -179,30 +143,19 @@ export = (RED: Red) => {
         response.send();
     });
 
-    RED.httpAdmin.get('/somfy/:boxid/sites', function (req, res) {
-        var configNode = RED.nodes.getNode(req.params.boxid) as any;
-        request({
-            url: 'https://api.somfy.com/api/v1/site',
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + configNode.accesstoken
-            }
-        }, (err, response, data) => {
-            console.log(data);
-            res.json(JSON.parse(data)); // FIXME: Any other option than JSON.parse here? Handle error.
-        });
+    RED.httpAdmin.get('/somfy/:account/sites', function (req, res) {
+        const configNode = RED.nodes.getNode(req.params.account) as any;
+        const somfyApiClient = new SomfyApi(RED, configNode.context, req.params.account);
+
+        somfyApiClient.getSites()
+            .then((sites: any) => res.json(sites));
     });
 
-    RED.httpAdmin.get('/somfy/:boxid/site/:siteid/devices', function (req, res) {
-        var configNode = RED.nodes.getNode(req.params.boxid) as any;
-        request({
-            url: 'https://api.somfy.com/api/v1/site/' + req.params.siteid + '/device',
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + configNode.accesstoken
-            }
-        }, (err, response, data) => {
-            res.json(JSON.parse(data)); // FIXME: Any other option than JSON.parse here? Also, remove the HUB form the device.
-        });
+    RED.httpAdmin.get('/somfy/:account/site/:siteid/devices', function (req, res) {
+        const configNode = RED.nodes.getNode(req.params.account) as any;
+        const somfyApiClient = new SomfyApi(RED, configNode.context, req.params.account);
+
+        somfyApiClient.getDevicesForSite(req.params.siteid)
+            .then((devices: any) => res.json(devices));
     });
 };
