@@ -36,8 +36,8 @@
     }
   },
   "dependencies": {
-    "q": "1.5.1",
-    "request": "2.88.0"
+    "axios": "0.19.0",
+    "q": "1.5.1"
   },
   "devDependencies": {
     "@types/node": "^11.12.1",
