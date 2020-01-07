@@ -56,7 +56,7 @@
 					return;
 				}
 				const tahoma_site_id = $("#node-input-site").val();
-				if(tahoma_site_id === '_NO_SITE_') {
+				if(tahoma_site_id === '_NO_SITE_' || tahoma_site_id === null) {
 					$("#node-input-device").empty().html('<option value="_NO_DEVICE_" selected="selected">No devices found.</option>');
 					return;
 				}
