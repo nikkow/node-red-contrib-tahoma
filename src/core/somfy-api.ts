@@ -2,6 +2,8 @@ import { Red } from 'node-red';
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { INetworkError } from '../interfaces/network-error';
 import { ICommand } from '../interfaces/command';
+import { IDevice } from '../interfaces/device';
+import { ICommandExecutionResponse } from '../interfaces/command-execution-response';
 
 export class SomfyApi {
     private static SOMFY_BASE_URL: string = 'https://api.somfy.com/api/v1';
@@ -71,7 +73,7 @@ export class SomfyApi {
         return this.context().global.get('somfy_api_refresh_token');
     }
 
-    public getDevice(device: string): Promise<any> { // TODO: Type device
+    public getDevice(device: string): Promise<IDevice> {
         return this._request({
             url: `${SomfyApi.SOMFY_BASE_URL}/device/${device}`,
             method: 'GET'
@@ -85,14 +87,14 @@ export class SomfyApi {
         });
     }
 
-    public getDevicesForSite(site: string): Promise<any> {
+    public getDevicesForSite(site: string): Promise<IDevice[]> {
         return this._request({
             url: `${SomfyApi.SOMFY_BASE_URL}/site/${site}/device`,
             method: 'GET'
         });
     }
 
-    public sendCommandToDevice(device: string, command: ICommand): Promise<any> {
+    public sendCommandToDevice(device: string, command: ICommand): Promise<ICommandExecutionResponse> {
         return this._request({
             url: `${SomfyApi.SOMFY_BASE_URL}/device/${device}/exec`,
             method: 'POST',

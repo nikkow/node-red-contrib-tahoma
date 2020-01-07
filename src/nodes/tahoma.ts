@@ -2,6 +2,7 @@ import { Red } from 'node-red';
 import { ICommand } from '../interfaces/command';
 import { SomfyApi } from '../core/somfy-api';
 import { ICommandExecutionResponse } from '../interfaces/command-execution-response';
+import { IDevice, IDeviceState } from '../interfaces/device';
 
 
 export = (RED: Red) => {
@@ -13,8 +14,10 @@ export = (RED: Red) => {
 
             setTimeout(() => {
                 somfyApiClient.getDevice(device)
-                    .then((deviceState: any) => { // TODO: Type that
-                        const currentPosition = parseInt(deviceState.states.find(state => state.name === 'position').value, 10);
+                    .then((deviceState: IDevice) => { // TODO: Type that
+                        const currentPosition = parseInt(
+                            deviceState.states.find((state: IDeviceState) => state.name === 'position').value
+                        , 10);
 
                         if (currentPosition === expectedState.position) {
                             return resolve({ finished: true });
