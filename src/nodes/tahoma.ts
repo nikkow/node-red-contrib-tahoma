@@ -91,12 +91,13 @@ export = (RED: Red) => {
             }
 
             const command: ICommand = {
-                name: msg.payload.lowspeed ? 'setClosureAndLinearSpeed' : commandName,
+                name: commandName,
                 parameters: parameters || []
             };
 
-            if (msg.payload.lowspeed) {
-                command.parameters = [expectedState.position, 'lowspeed'];
+            if (msg.payload.lowspeed && command.name !== 'stop') {
+                command.name = 'position_low_speed';
+                command.parameters = [{ name: 'position', value: parseInt(expectedState.position, 10) }];
                 statusProgressText = statusProgressText.substring(0, (statusProgressText.length - 3)) + ' (Low Speed)...';
             }
 
