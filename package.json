@@ -6,8 +6,7 @@
   "scripts": {
     "build": "mkdir -p dist/nodes/ && cp -a src/nodes/*.html dist/nodes/ && tsc ",
     "execute": "npm run build && node-red",
-    "pretest": "eslint --ignore-path .gitignore .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "tslint -c tslint.json src/**/*.ts"
   },
   "repository": {
     "type": "git",
@@ -36,14 +35,11 @@
     }
   },
   "dependencies": {
-    "axios": "0.19.0",
-    "q": "1.5.1"
+    "axios": "0.19.1"
   },
   "devDependencies": {
-    "@types/node": "^11.12.1",
-    "@types/node-red": "^0.17.3",
-    "eslint": "^6.8.0",
-    "eslint-config-strongloop": "^2.1.0",
-    "typescript": "3.3.1"
+    "@types/node": "13.1.4",
+    "@types/node-red": "0.20.1",
+    "typescript": "3.7.4"
   }
 }
