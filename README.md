@@ -12,7 +12,7 @@ You can read this [guide](https://nodered.org/docs/getting-started/adding-nodes)
 	npm install node-red-contrib-tahoma
 
 ## Disclaimer
-This software is provided as-is. Be careful: your devices can be totally controlled via API actions. I am not responsible of any mis-usage or corruption of the devices configuration.
+This software is provided **as-is**. Be careful: your devices can be fully controlled via API actions. I am not responsible of any mis-usage or corruption of the devices configuration.
 
 ## Configuration
 
@@ -67,5 +67,4 @@ Feel free to send any feedback of any other compatible items or known limitation
 
 These are the things that should be updated (and will be later) on this module:
 
-* Filter elements that can actually be controlled (e.g. do not display the "Active Button")
 * Find a way to properly handle "my" position

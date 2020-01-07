@@ -1,6 +1,21 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] - xxx
+
+****
+🚨 **This release is a major version and contains some breaking changes. Please read the list below.**
+****
+
+### Changed
+
+- Implementation of Somfy Open API, replacing unofficial TahomaLink API
+- Migration of the network layer from deprecated [request](https://www.npmjs.com/package/request) to [axios](https://www.npmjs.com/package/axios)
+
+### Added
+
+- New code quality control using TSLint 
+
 ## [1.0.0] - 2018-12-13
 
 ### Changed
