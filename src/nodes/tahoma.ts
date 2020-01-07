@@ -47,13 +47,10 @@ export = (RED: Red) => {
         this.site = config.site;
         this.tahomabox = config.tahomabox;
 
-        this.on('input', (msg) => {
+        this.on('input', (msg) => { // TODO: Type msg
             if (typeof msg.payload !== 'object') {
                 return;
             }
-
-            const action: any = {}; // TODO: Type this.
-            action.deviceURL = this.device;
 
             let commandName = '';
             let parameters = [];
