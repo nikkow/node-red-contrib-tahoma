@@ -13,13 +13,11 @@ export = (RED: Red) => {
             const somfyApiClient = new SomfyApi(RED, configNode.context, account);
 
             setTimeout(() => {
-                console.log('Calling API...');
                 somfyApiClient.getDevice(device)
                     .then((deviceState: any) => { // TODO: Type that
                         const currentPosition = parseInt(deviceState.states.find(state => state.name === "position").value);
 
                         if (currentPosition === expectedState.position) {
-                            console.log('Return resolve(true);')
                             return resolve({ finished: true });
                         }
 
@@ -116,7 +114,6 @@ export = (RED: Red) => {
                     const jobId = commandExecutionFeedback.job_id;
 
                     waitUntilExpectedState(this.tahomabox, this.device, expectedState, jobId).then((isFinished) => {
-                        console.log('Finished - Callback');
                         this.status({
                             fill: isFinished ? 'green' : 'red',
                             shape: 'dot',
