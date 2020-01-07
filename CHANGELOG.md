@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 
 - Implementation of Somfy Open API, replacing unofficial TahomaLink API
 - Migration of the network layer from deprecated [request](https://www.npmjs.com/package/request) to [axios](https://www.npmjs.com/package/axios)
+- `tahoma-read` node now returns the raw response from the [Somfy Open API](https://developer.somfy.com/somfy-open-api/apis/get/site/%7BsiteId%7D/device}) (a remapping of your flows might be needed)
 
 ### Added
 
