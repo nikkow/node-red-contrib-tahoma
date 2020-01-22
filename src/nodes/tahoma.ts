@@ -10,8 +10,10 @@ export = (RED: Red) => {
     const timerRetries = {};
     const waitUntilExpectedState = (account, device, expectedState, jobId): Promise<any> => {
         return new Promise((resolve) => {
-            if(!account) return;
-            
+            if (!account) {
+                return;
+            }
+
             const configNode = RED.nodes.getNode(account) as any;
             const somfyApiClient = new SomfyApi(RED, configNode.context, account);
 

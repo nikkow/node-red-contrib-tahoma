@@ -24,7 +24,8 @@ export class SomfyApi {
             (request: AxiosRequestConfig) => {
                 return request;
             }
-        )
+        );
+
         this.axiosInstance.interceptors.response.use(
             (response: AxiosResponse) => {
                 return response;
@@ -34,7 +35,7 @@ export class SomfyApi {
                     return Promise.reject(error);
                 }
 
-                const refreshTokenUrl = `${SomfyApi.SOMFY_AUTH_URL}/token?client_id=${configNode.apikey}&client_secret=${configNode.apisecret}&grant_type=refresh_token&refresh_token=${this.getRefreshToken()}`
+                const refreshTokenUrl = `${SomfyApi.SOMFY_AUTH_URL}/token?client_id=${configNode.apikey}&client_secret=${configNode.apisecret}&grant_type=refresh_token&refresh_token=${this.getRefreshToken()}`;
 
                 return axios({
                         url: refreshTokenUrl,
