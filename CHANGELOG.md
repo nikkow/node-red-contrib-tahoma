@@ -17,6 +17,12 @@ All notable changes to this project will be documented in this file.
 
 - New code quality control using TSLint 
 
+## [1.0.1] - 2019-08-21
+
+### Changed
+
+- Added door handle state support, contributed by [@matthub](https://github.com/matthub)
+
 ## [1.0.0] - 2018-12-13
 
 ### Changed
@@ -31,7 +37,6 @@ All notable changes to this project will be documented in this file.
 - New node `tahoma-read` (See [#6](https://github.com/nikkow/node-red-contrib-tahoma/issues/6))
 - New `stop` action to immediatly stop the current action on the devices (See [#5](https://github.com/nikkow/node-red-contrib-tahoma/pull/5), thanks to [@Genosse274](https://github.com/Genosse274))
 - New CHANGELOG.md file to keep track of all updates.
-
 
 ### Changed
 

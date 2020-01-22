@@ -106,6 +106,12 @@ var getDeviceState = function getDeviceState(deviceURL) {
           if (_thisDevice.states[j].name === 'core:LuminanceState') {
             response.luminance = _thisDevice.states[j].value;
           }
+
+          // - Exposes door handle value
+          if (_thisDevice.states[j].name ===
+              'core:ThreeWayHandleDirectionState') {
+            response.handleState = _thisDevice.states[j].value;
+          }
         }
 
         return deferred.resolve(response);
