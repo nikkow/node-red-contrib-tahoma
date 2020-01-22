@@ -1,5 +1,5 @@
 import { Red } from 'node-red';
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse, AxiosInstance } from 'axios';
 import { INetworkError } from '../interfaces/network-error';
 import { ICommand } from '../interfaces/command';
 import { IDevice } from '../interfaces/device';
@@ -11,15 +11,21 @@ export class SomfyApi {
     private static HTTP_OK: number = 200;
     private static HTTP_UNAUTHORIZED: number = 401;
     private context;
+    private axiosInstance: AxiosInstance;
 
     constructor(private readonly RED: Red, context: any, private readonly account: string) {
         this.context = context;
+        this.axiosInstance = axios.create();
 
         const configNode = this.RED.nodes.getNode(account) as any; // TODO: Type this
 
-        axios.defaults.headers.common['Authorization'] = `Bearer ${this.getAccessToken()}`;
-
-        axios.interceptors.response.use(
+        this.axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${this.getAccessToken()}`;
+        this.axiosInstance.interceptors.request.use(
+            (request: AxiosRequestConfig) => {
+                return request;
+            }
+        )
+        this.axiosInstance.interceptors.response.use(
             (response: AxiosResponse) => {
                 return response;
             },
@@ -28,21 +34,21 @@ export class SomfyApi {
                     return Promise.reject(error);
                 }
 
+                const refreshTokenUrl = `${SomfyApi.SOMFY_AUTH_URL}/token?client_id=${configNode.apikey}&client_secret=${configNode.apisecret}&grant_type=refresh_token&refresh_token=${this.getRefreshToken()}`
+
                 return axios({
-                        url: `${SomfyApi.SOMFY_AUTH_URL}/token`,
+                        url: refreshTokenUrl,
                         method: 'GET',
-                        params: {
-                            client_id: configNode.apikey,
-                            client_secret: configNode.apisecret,
-                            grant_type: 'refresh_token',
-                            refresh_token: this.getRefreshToken()
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
                         }
                     })
                     .then(response => {
                         this.context().global.set('somfy_api_access_token', response.data.access_token);
                         this.context().global.set('somfy_api_refresh_token', response.data.refresh_token);
 
-                        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.access_token}`;
+                        this.axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${response.data.access_token}`;
 
                         error.hasRefreshedToken = true;
                         return Promise.reject(error);
@@ -52,7 +58,7 @@ export class SomfyApi {
     }
 
     private _request(options: AxiosRequestConfig): Promise<any> {
-        return axios(options)
+        return this.axiosInstance(options)
             .then((response: AxiosResponse) => {
                 if (response.status !== SomfyApi.HTTP_OK) {
                     return 'http_error';
