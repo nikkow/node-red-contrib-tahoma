@@ -1,6 +1,22 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] - xxx
+
+****
+🚨 **This release is a major version and contains some breaking changes. Please read the list below.**
+****
+
+### Changed
+
+- Implementation of Somfy Open API, replacing unofficial TahomaLink API
+- Migration of the network layer from deprecated [request](https://www.npmjs.com/package/request) to [axios](https://www.npmjs.com/package/axios)
+- `tahoma-read` node now returns the raw response from the [Somfy Open API](https://developer.somfy.com/somfy-open-api/apis/get/site/%7BsiteId%7D/device}) (a remapping of your flows might be needed)
+
+### Added
+
+- New code quality control using TSLint 
+
 ## [1.0.1] - 2019-08-21
 
 ### Changed

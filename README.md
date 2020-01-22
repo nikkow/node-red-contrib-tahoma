@@ -1,8 +1,10 @@
 # Somfy Tahoma for Node-RED
 
-![npm](https://img.shields.io/npm/v/node-red-contrib-tahoma.svg)
-![npm](https://img.shields.io/npm/dt/node-red-contrib-tahoma.svg) 
+[![npm](https://img.shields.io/npm/v/node-red-contrib-tahoma.svg)](https://www.npmjs.com/package/node-red-contrib-tahoma)
+[![Build Status](https://travis-ci.org/nikkow/node-red-contrib-tahoma.svg?branch=develop-v2)](https://travis-ci.org/nikkow/node-red-contrib-tahoma)
+[![npm](https://img.shields.io/npm/dt/node-red-contrib-tahoma.svg)](https://www.npmjs.com/package/node-red-contrib-tahoma)
 ![license](https://img.shields.io/github/license/nikkow/node-red-contrib-tahoma.svg)
+![code size](https://img.shields.io/github/languages/code-size/nikkow/node-red-contrib-tahoma)
 
 ## Setup
 
@@ -12,7 +14,7 @@ You can read this [guide](https://nodered.org/docs/getting-started/adding-nodes)
 	npm install node-red-contrib-tahoma
 
 ## Disclaimer
-This software is provided as-is. Be careful: your devices can be totally controlled via API actions. I am not responsible of any mis-usage or corruption of the devices configuration.
+This software is provided **as-is**. Be careful: your devices can be fully controlled via API actions. I am not responsible of any mis-usage or corruption of the devices configuration.
 
 ## Configuration
 
@@ -21,6 +23,8 @@ In order to use this node, you need to have a Tahoma Link account. If you alread
 When creating your first node, you will be asked to provide your e-mail and password used to login to your Tahoma Link account. These will be used to connect to the API (of course, they will only be used locally, they are not forwarded to me :)).
 
 ## Usage
+
+### Node `tahoma`
 
 This node accepts an object as input. The following properties will be parsed:
 
@@ -62,10 +66,3 @@ This was tested with the following devices:
 * Sunea IO Awning (thanks to @xeor)
 
 Feel free to send any feedback of any other compatible items or known limitations :)
-
-## To-do
-
-These are the things that should be updated (and will be later) on this module:
-
-* Filter elements that can actually be controlled (e.g. do not display the "Active Button")
-* Find a way to properly handle "my" position
