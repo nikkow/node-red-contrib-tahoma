@@ -24,6 +24,8 @@ When creating your first node, you will be asked to provide your e-mail and pass
 
 ## Usage
 
+### Node `tahoma`
+
 This node accepts an object as input. The following properties will be parsed:
 
 | Property | Type | Required? | Description |
@@ -64,9 +66,3 @@ This was tested with the following devices:
 * Sunea IO Awning (thanks to @xeor)
 
 Feel free to send any feedback of any other compatible items or known limitations :)
-
-## To-do
-
-These are the things that should be updated (and will be later) on this module:
-
-* Find a way to properly handle "my" position
