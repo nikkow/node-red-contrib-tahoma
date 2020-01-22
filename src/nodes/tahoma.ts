@@ -1,7 +1,7 @@
 import { Red } from 'node-red';
 import { ICommand } from '../interfaces/command';
 import { SomfyApi } from '../core/somfy-api';
-import { ICommandExecutionResponse } from '../interfaces/command-execution-response';
+import { ICommandExecutionResponse, ICommandExecutionFinalState } from '../interfaces/command-execution-response';
 import { IDevice, IDeviceState } from '../interfaces/device';
 import { IMessage } from '../interfaces/message';
 
@@ -10,6 +10,8 @@ export = (RED: Red) => {
     const timerRetries = {};
     const waitUntilExpectedState = (account, device, expectedState, jobId): Promise<any> => {
         return new Promise((resolve) => {
+            if(!account) return;
+            
             const configNode = RED.nodes.getNode(account) as any;
             const somfyApiClient = new SomfyApi(RED, configNode.context, account);
 
@@ -21,15 +23,15 @@ export = (RED: Red) => {
                         , 10);
 
                         if (currentPosition === expectedState.position) {
-                            return resolve({ finished: true });
+                            return resolve({ finished: true, deviceState });
                         }
 
                         return resolve({ finished: false, account, device, expectedState });
                     });
-            }, 10000);
-        }).then((response: { finished: boolean, tahomabox?: string, device?: string, expectedState?: object, jobId?: string }) => {
+            }, 5000);
+        }).then((response: ICommandExecutionFinalState) => {
             if (timerRetries.hasOwnProperty(response.jobId)) {
-                if (timerRetries[response.jobId] === 3 && !response.finished) {
+                if (timerRetries[response.jobId] === 10 && !response.finished) {
                     return false;
                 }
 
@@ -38,8 +40,14 @@ export = (RED: Red) => {
                 timerRetries[response.jobId] = 1;
             }
 
-            return response.finished ?
-                true : waitUntilExpectedState(response.tahomabox, response.device, response.expectedState, response.jobId);
+            if (response.finished) {
+                return {
+                    finished: true,
+                    state: response.deviceState
+                };
+            }
+
+            waitUntilExpectedState(response.tahomabox, response.device, response.expectedState, response.jobId);
         });
     };
 
@@ -115,9 +123,9 @@ export = (RED: Red) => {
 
                     const jobId = commandExecutionFeedback.job_id;
 
-                    waitUntilExpectedState(this.tahomabox, this.device, expectedState, jobId).then((isFinished) => {
+                    waitUntilExpectedState(this.tahomabox, this.device, expectedState, jobId).then((finalState) => {
                         this.status({
-                            fill: isFinished ? 'green' : 'red',
+                            fill: finalState.finished ? 'green' : 'red',
                             shape: 'dot',
                             text: statusDoneText
                         });
@@ -126,7 +134,10 @@ export = (RED: Red) => {
                             msg.payload = {};
                         }
 
+                        // - DEPRECATED: The output is there for backwards compatibility.
+                        // - it will be removed and msg.payload.states must be used instead.
                         msg.payload.output = expectedState || { open: true };
+                        msg.payload.states = finalState.state.states;
 
                         this.send(msg);
                     });
