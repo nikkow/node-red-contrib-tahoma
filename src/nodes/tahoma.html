@@ -108,5 +108,24 @@
 </script>
 
 <script type="text/x-red" data-help-name="tahoma">
-    <p>Execute actions on your Somfy Tahoma controllable devices.</p>
+    <p>Sends a command to a Somfy equipment.</p>
+
+	<h3>Inputs</h3>
+    <dl class="message-properties">
+		<dt>action <span class="property-type">string</span></dt>
+		<dd>this can take one of the following values: <code>open</code>, <code>close</code>, <code>stop</code> or <code>customPosition</code></dd>
+		<dt>position <span class="property-type">integer (0-100)</span></dt>
+		<dd>this applies for <code>customPosition</code> actions. this actually determines the opening percentage to apply (100 = fully closed)</dd>
+		<dt>lowspeed <span class="property-type">boolean</span></dt>
+		<dd>for compatible systems, sends the command as lowspeed, to decrease the speed of the wanted action. Default: false</dd>
+	</dl>
+
+ 	<h3>Outputs</h3>
+	<p>The outputted <code>msg.payload</code> will contain the full device state, as it would be returned by the <i>Read</i> node. For backwards compatbility, it still returns the <code>open</code> (boolean), <code>position</code> (integer, 0-100) and <code>luminance</code> properties.</p>
+
+	<h3>References</h3>
+    <ul>
+        <li><a href="https://developer.somfy.com/somfy-open-api/apis/get/site/%7BsiteId%7D/device" target="_blank">Somfy OpenAPI Reference</a> - full schema</li>
+        <li><a href="https://github.com/nikkow/node-red-tahoma" target="_blank">GitHub</a> - the nodes github repository</li>
+    </ul>
 </script>
