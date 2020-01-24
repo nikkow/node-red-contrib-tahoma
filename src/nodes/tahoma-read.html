@@ -107,5 +107,24 @@
 </script>
 
 <script type="text/x-red" data-help-name="tahoma-read">
-    <p>Reads the current position/value of a given Tahoma controllable device.</p>
+    <p>Reads the current status of a Somfy equipment.</p>
+
+	<h3>Inputs</h3>
+    <p>This node has no input.</p>
+
+ 	<h3>Outputs</h3>
+	<dl class="message-properties">
+		<dt>payload <span class="property-type">IDevice</span></dt>
+		<dd>the current status of the requested device</dd>
+	</dl>
+
+
+	<h3>Details</h3>
+    <p><code>msg.payload</code> contains the full response returned by Somfy OpenAPI for a given device. It includes its current states, capabilities, and metadata. Check the references for more information.</p>
+
+	<h3>References</h3>
+    <ul>
+        <li><a href="https://developer.somfy.com/somfy-open-api/apis/get/site/%7BsiteId%7D/device" target="_blank">Somfy OpenAPI Reference</a> - full schema</li>
+        <li><a href="https://github.com/nikkow/node-red-tahoma" target="_blank">GitHub</a> - the nodes github repository</li>
+    </ul>
 </script>
