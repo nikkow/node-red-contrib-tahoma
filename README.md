@@ -18,9 +18,11 @@ This software is provided **as-is**. Be careful: your devices can be fully contr
 
 ## Configuration
 
-In order to use this node, you need to have a Tahoma Link account. If you already use the Tahoma Box and the mobile apps, you should have one.
+In order to use this node, you need to have a Somfy account. If you already use the Tahoma Box and the mobile apps, you should have one.
 
-When creating your first node, you will be asked to provide your e-mail and password used to login to your Tahoma Link account. These will be used to connect to the API (of course, they will only be used locally, they are not forwarded to me :)).
+You will also need to create an app on the developer portal in order to retrieve a set of required credentials. This [guide](#) will walk you through this process.
+
+When creating your first node, you will be asked to provide your e-mail and password used to login to your Somfy account. These will be used to connect to the API (of course, they will only be used locally, they are not forwarded to me :)).
 
 ## Usage
 
