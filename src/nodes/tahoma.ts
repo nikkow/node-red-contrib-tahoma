@@ -4,6 +4,7 @@ import { SomfyApi } from '../core/somfy-api';
 import { ICommandExecutionResponse, ICommandExecutionFinalState } from '../interfaces/command-execution-response';
 import { IDevice, IDeviceState } from '../interfaces/device';
 import { IMessage } from '../interfaces/message';
+import { INetworkError } from '../interfaces/network-error';
 
 
 export = (RED: Red) => {
@@ -143,6 +144,19 @@ export = (RED: Red) => {
 
                         this.send(msg);
                     });
+                })
+                .catch((error: INetworkError) => {
+                    if (error.isRefreshTokenExpired) {
+                        this.error('Session has expired and refresh token is no longer active. You need to login again through the config node to perform this action.');
+                        this.status({
+                            fill: 'red',
+                            shape: 'dot',
+                            text: 'Session expired. See debug tab for more info'
+                        });
+                    }
+
+                    msg.payload = null;
+                    this.send(msg);
                 });
         });
     });
