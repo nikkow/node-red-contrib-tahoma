@@ -40,7 +40,7 @@
                 $(".api-credentials-ok").hide();
             })
 
-            $("#api-link").on('click', function() {
+            $(".api-link").on('click', function() {
                 const API_KEY = $("#node-config-input-apikey").val();
                 const API_SECRET = $("#node-config-input-apisecret").val();
                 const CALLBACK = window.location.protocol + '//'+ window.location.host + window.location.pathname + 'somfy/callback';
@@ -67,7 +67,7 @@
         <input type="text" id="node-config-input-apisecret">
     </div>
 
-    <button class="api-credentials" id="api-link">Link Node-Red to Tahoma</button>
+    <button class="api-credentials api-link">Link Node-Red to Tahoma</button>
 
     <div class="api-credentials-ok">
         You have already setup your API credentials. Click <a href="#" id="api-credentials-edit">here</a> if you want to edit them.
@@ -79,5 +79,9 @@
     <div class="form-row api-credentials-ok">
         <label for="node-config-input-refreshtoken"><i class="icon-bookmark"></i> Refresh Token:</label>
         <input type="text" id="node-config-input-refreshtoken" readonly="readonly">
+    </div>
+    <div class="form-tips api-credentials-ok">
+        <b>Tip:</b> Received a <i>Session expired</i> error? Click <a href="#" class="api-link">here</a> to reset your tokens, and click on the <i>Update</i> button. 
+        Do not forget to <b>deploy</b> the flow to save the new credentials.
     </div>
 </script>
