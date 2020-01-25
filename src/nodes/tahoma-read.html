@@ -45,6 +45,9 @@
 					$("#node-input-site").empty().html(html);
 					$("#node-input-site").prop('disabled', false);
 					loadDevices();
+				}, function(error) {
+					$("#node-input-site").empty().prop('disabled', true).html(`<option value="${selected_site}">${selected_site}</option>`);
+					$("#node-input-device").empty().prop('disabled', true).html(`<option value="${selected_device}">${selected_device}</option>`);;
 				});
 			}
 
@@ -77,6 +80,8 @@
 
 					$("#node-input-device").empty().html(html);
 					$("#node-input-device").prop('disabled', false);
+				}, function(error) {
+					$("#node-input-device").empty().prop('disabled', true).html(`<option value="${selected_device}">${selected_device}</option>`);;
 				});
 			}
 
