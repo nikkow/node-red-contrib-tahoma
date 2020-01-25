@@ -11,7 +11,7 @@
 You can read this [guide](https://nodered.org/docs/getting-started/adding-nodes) from Node-RED official portal. This will help you install this node. Typically, the command are as follows:
 
 	cd $HOME/.node-red
-	npm install node-red-contrib-tahoma
+	npm install node-red-contrib-tahoma 
 
 ## Disclaimer
 This software is provided **as-is**. Be careful: your devices can be fully controlled via API actions. I am not responsible of any mis-usage or corruption of the devices configuration.
@@ -34,7 +34,7 @@ This node accepts an object as input. The following properties will be parsed:
 | `position` | int (0-100) | *No* | The position you want to set your blinds/door to |
 | `lowspeed` | boolean | *No* | Should the action be triggered in low-speed mode? |
 
-### Actions
+#### Actions
 
 Currently, only a few commands are understood by this node. The possible values for the `action` property are:
 
@@ -43,13 +43,21 @@ Currently, only a few commands are understood by this node. The possible values 
 * `stop`: This will stop all running actions
 * `customPosition`: This will set the device to a custom position. The position is passed using the `position` property, which is required in this mode.
 
-### Output
+#### Output
 
 The node will output its original `msg.payload` enriched with the result of the expected action. `msg.payload.output` will contain 2 properties:
 
 * `open`: a boolean. Set to true if the device is open, or false otherwise
 * `position`: an integer (0-100). Set to the position returned by the Tahoma box.
 * `luminance`: in case of a Sun Sensor, returns the current value of core:LuminanceState (See issue [#6](https://github.com/nikkow/node-red-contrib-tahoma/issues/6))
+
+### Node `tahoma-read`
+
+This node does not accept any input. You can specify the desired device by editing the node properties.
+
+#### Output
+
+The node will output its original `msg.payload` enriched with the selected device information. A full example can be found on the Somfy Open API [documentation](https://developer.somfy.com/somfy-open-api/apis/get/site/%7BsiteId%7D/device).
 
 ## Example flow
 
