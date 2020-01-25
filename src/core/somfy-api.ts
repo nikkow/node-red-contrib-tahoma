@@ -1,5 +1,5 @@
 import { Red } from 'node-red';
-import axios, { AxiosRequestConfig, AxiosResponse, AxiosInstance } from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse, AxiosInstance, AxiosError } from 'axios';
 import { INetworkError } from '../interfaces/network-error';
 import { ICommand } from '../interfaces/command';
 import { IDevice } from '../interfaces/device';
@@ -10,6 +10,7 @@ export class SomfyApi {
     private static SOMFY_AUTH_URL: string = 'https://accounts.somfy.com/oauth/oauth/v2';
     private static HTTP_OK: number = 200;
     private static HTTP_UNAUTHORIZED: number = 401;
+    private static HTTP_BAD_REQUEST: number = 400;
     private context;
     private axiosInstance: AxiosInstance;
 
@@ -52,6 +53,18 @@ export class SomfyApi {
                         this.axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${response.data.access_token}`;
 
                         error.hasRefreshedToken = true;
+                        return Promise.reject(error);
+                    })
+                    .catch((refreshTokenRequestError: AxiosError) => {
+                        if (refreshTokenRequestError.response.status === SomfyApi.HTTP_BAD_REQUEST) {
+                            const refreshTokenRequestErrorData = refreshTokenRequestError.response.data;
+                            if (refreshTokenRequestErrorData.hasOwnProperty('message') && refreshTokenRequestErrorData.message === 'error.invalid.grant') {
+                                this.context().global.set('somfy_api_access_token', null);
+                                this.context().global.set('somfy_api_refresh_token', null);
+                                error.isRefreshTokenExpired = true;
+                            }
+                        }
+
                         return Promise.reject(error);
                     });
             }
