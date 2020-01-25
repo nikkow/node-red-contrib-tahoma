@@ -66,3 +66,29 @@ This was tested with the following devices:
 * Sunea IO Awning (thanks to @xeor)
 
 Feel free to send any feedback of any other compatible items or known limitations :)
+
+## FAQ / Troubleshooting
+
+### I received a "Session expired" error, what happned?
+
+![Session expired error](docs/images/ts-session-expired-node.png) 
+
+During the login process, Somfy generates a set of credentials composed of two tokens: the first is called an **access token** and the second a **refresh token** (following the [OAuth2](https://oauth.net/2/) protocol). 
+
+Both these tokens expire at some point. 
+
+The **access token** (used to authenticate each request sent to Somfy API) has a very short lifetime (1 hour) and needs to be regenerated afterwards. To prevent you from entering your e-mail/password each hour, the **refresh token** handles this new authentication. Whenever the access token expires, a new authentication request is sent and Somfy generates a brand-new set of tokens.
+
+However, the **refresh token** has not an infinite lifetime. It expires after **14 days**. Basically, it means that if node-red hasn't reached the Somfy API for 14 days + 1 hour, both your token have expired and you need to login again. 
+
+#### What should I do?
+
+This error is also described in the "Debug" tab of your node:
+
+![Session expired error](docs/images/ts-session-expired-log.png) 
+
+All you need to do is open your node configuration, edit your account and follow the instructions on the yellow box:
+
+![Yellow box](docs/images/ts-session-expires-tip.png)
+
+**Note:** do not forget to **deploy** your flow, so the new credentials are properly saved. 
