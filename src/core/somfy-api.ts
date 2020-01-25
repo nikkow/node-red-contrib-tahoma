@@ -20,9 +20,9 @@ export class SomfyApi {
 
         const configNode = this.RED.nodes.getNode(account) as any; // TODO: Type this
 
-        this.axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${this.getAccessToken()}`;
         this.axiosInstance.interceptors.request.use(
             (request: AxiosRequestConfig) => {
+                request.headers['Authorization'] = `Bearer ${this.getAccessToken()}`;
                 return request;
             }
         );
