@@ -11,6 +11,16 @@
 ![license](https://img.shields.io/github/license/nikkow/node-red-contrib-tahoma.svg)
 ![code size](https://img.shields.io/github/languages/code-size/nikkow/node-red-contrib-tahoma)
 
+## 🚨 Important Note vor v1.x users
+
+Due to a recent change in the API used in v1, most of you were encountering issues during the configuration of your node (e.g. empty device list...). **This API was unofficial and we had no control over it** :) 
+
+This new v2.0 version implements the Somfy Open API, which is officially available for third-party software as this one.
+
+Even though your flows should not be modified, the [config-node](https://nodered.org/docs/user-guide/editor/workspace/nodes#configuration-nodes) must be reconfigured using this new API.
+
+**However**, please note that even though this release was tested before being published, you might encounter unexpected issues. **Please backup your flow before proceeding with this major release**.
+
 ## Setup
 
 You can read this [guide](https://nodered.org/docs/getting-started/adding-nodes) from Node-RED official portal. This will help you install this node. Typically, the command are as follows:
