@@ -1,4 +1,9 @@
+<p align="center">
+	<img src="docs/images/somfy-logo.png">
+</p>
+
 # Somfy Tahoma for Node-RED
+
 
 [![npm](https://img.shields.io/npm/v/node-red-contrib-tahoma.svg)](https://www.npmjs.com/package/node-red-contrib-tahoma)
 [![Build Status](https://travis-ci.org/nikkow/node-red-contrib-tahoma.svg?branch=develop-v2)](https://travis-ci.org/nikkow/node-red-contrib-tahoma)
