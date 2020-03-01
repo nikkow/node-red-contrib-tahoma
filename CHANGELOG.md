@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2.0.1] - 2020-03-01
+
+### Changed
+
+- Fix publication to NPM registry issue (See [#20](https://github.com/nikkow/node-red-contrib-tahoma/issues/20))
+
 ## [2.0.0] - 2020-03-01
 
 ****
