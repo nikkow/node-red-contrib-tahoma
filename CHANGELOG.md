@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [2.0.0] - xxx
+## [2.0.0] - 2020-03-01
 
 ****
 🚨 **This release is a major version and contains some breaking changes. Please read the list below.**
