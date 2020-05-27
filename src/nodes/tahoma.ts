@@ -93,7 +93,7 @@ export = (RED: Red) => {
                     statusDoneText = 'Set to ' + msg.payload.position + '%';
                     expectedState = { open: true, position: msg.payload.position };
                     break;
-				case 'customRotation':
+                case 'customRotation':
                     commandName = 'rotation';
                     parameters = [{ name: 'orientation', value: parseInt(msg.payload.orientation, 10) }];
                     statusProgressText = 'Rotating to ' + msg.payload.orientation + 'degrees...';
