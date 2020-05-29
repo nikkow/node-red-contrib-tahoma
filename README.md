@@ -49,6 +49,7 @@ This node accepts an object as input. The following properties will be parsed:
 | -------- | ---- | --------- | ----------- |
 | `action` | enum (see below) | **Yes** | The action to perform |
 | `position` | int (0-100) | *No* | The position you want to set your blinds/door to |
+| `rotation` | int (0-100) | *No* | The rotation you want to set your blinds to |
 | `lowspeed` | boolean | *No* | Should the action be triggered in low-speed mode? |
 
 #### Actions
@@ -59,6 +60,7 @@ Currently, only a few commands are understood by this node. The possible values 
 * `close`: This will close the device
 * `stop`: This will stop all running actions
 * `customPosition`: This will set the device to a custom position. The position is passed using the `position` property, which is required in this mode.
+* `customRotation`: This will set the device (blinds) to a custom rotation. The rotation is passed using the `orientation` property, which is required in this mode.
 
 #### Output
 
