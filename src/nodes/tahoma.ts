@@ -96,8 +96,8 @@ export = (RED: Red) => {
                 case 'customRotation':
                     commandName = 'rotation';
                     parameters = [{ name: 'orientation', value: parseInt(msg.payload.orientation, 10) }];
-                    statusProgressText = 'Rotating to ' + msg.payload.orientation + 'degrees...';
-                    statusDoneText = 'Rotated to ' + msg.payload.orientation + '%';
+                    statusProgressText = 'Rotating to ' + msg.payload.orientation + '°...';
+                    statusDoneText = 'Rotated to ' + msg.payload.orientation + '°';
                     expectedState = { orientation: msg.payload.orientation };
                     break;
                 case 'stop':
