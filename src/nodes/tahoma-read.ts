@@ -15,7 +15,9 @@ export = (RED: Red) => {
         this.tahomabox = config.tahomabox;
 
         this.on('input', (msg: IMessage) => {
-            const somfyApiClient = new SomfyApi(RED, this.context, this.tahomabox);
+            const configNode = RED.nodes.getNode(this.tahomabox) as any;
+            const somfyApiClient = new SomfyApi(RED, configNode, this.tahomabox);
+
             somfyApiClient.getDevice(this.device)
                 .then((deviceData) => {
                     msg.payload = deviceData;
