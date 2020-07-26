@@ -72,7 +72,8 @@ The node will output its original `msg.payload` enriched with the result of the 
 
 ### Node `tahoma-read`
 
-This node does not accept any input. You can specify the desired device by editing the node properties.
+This node will ignore all data provided as input. You can specify the desired device by editing the node properties.
+(Note: you can still trigger a `tahoma-read` instuction periodically by using an `inject` node. See [#28](https://github.com/nikkow/node-red-contrib-tahoma/issues/28#issuecomment-615755280))
 
 #### Output
 
