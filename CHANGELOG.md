@@ -1,6 +1,20 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2.0.2] - xxx
+
+### Added
+
+- Added support for blinds rotation for motors that support it (See [#33](https://github.com/nikkow/node-red-contrib-tahoma/pull/33), thanks to [@marekhalmo](https://github.com/marekhalmo))
+
+### Changed
+
+- Fixed an issue that prevented tokens from being correctly refreshed
+
+### Refactoring
+
+- Refactored the network layer to retrieve credentials from memory, instead of global context.
+
 ## [2.0.1] - 2020-03-01
 
 ### Changed
