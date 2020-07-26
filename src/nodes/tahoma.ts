@@ -51,6 +51,8 @@ export = (RED: Red) => {
             }
 
             waitUntilExpectedState(response.tahomabox, response.device, response.expectedState, response.jobId);
+        }).catch((error) => {
+            this.error(`Cannot refresh Somfy device state. Received the following error: ${error}`);
         });
     };
 
@@ -134,26 +136,31 @@ export = (RED: Red) => {
 
                     const jobId = commandExecutionFeedback.job_id;
 
-                    waitUntilExpectedState(this.tahomabox, this.device, expectedState, jobId).then((finalState) => {
-                        this.status({
-                            fill: finalState.finished ? 'green' : 'red',
-                            shape: 'dot',
-                            text: statusDoneText
+                    waitUntilExpectedState(this.tahomabox, this.device, expectedState, jobId)
+                        .then((finalState) => {
+                            this.status({
+                                fill: finalState.finished ? 'green' : 'red',
+                                shape: 'dot',
+                                text: statusDoneText
+                            });
+
+                            if (!('payload' in msg)) {
+                                msg.payload = {};
+                            }
+
+                            // - DEPRECATED: The output is there for backwards compatibility.
+                            // - it will be removed and msg.payload.states must be used instead.
+                            msg.payload.output = expectedState || { open: true };
+                            msg.payload.states = finalState.state.states;
+
+                            this.send(msg);
+                        })
+                        .catch((error) => {
+                            this.error(`Cannot refresh Somfy device state. Received the following error: ${error}`);
                         });
-
-                        if (!('payload' in msg)) {
-                            msg.payload = {};
-                        }
-
-                        // - DEPRECATED: The output is there for backwards compatibility.
-                        // - it will be removed and msg.payload.states must be used instead.
-                        msg.payload.output = expectedState || { open: true };
-                        msg.payload.states = finalState.state.states;
-
-                        this.send(msg);
-                    });
                 })
                 .catch((error: INetworkError) => {
+                    this.error(`Token has expired. The renewas didn't happen as expected. Do not hesitate to create an issue on Github.`);
                     if (error.isRefreshTokenExpired) {
                         this.error('Session has expired and refresh token is no longer active. You need to login again through the config node to perform this action.');
                         this.status({
