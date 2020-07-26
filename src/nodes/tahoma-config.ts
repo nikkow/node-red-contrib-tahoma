@@ -10,9 +10,6 @@ export = (RED: Red) => {
         this.apisecret = props.apisecret;
         this.accesstoken = props.accesstoken;
         this.refreshtoken = props.refreshtoken;
-
-        this.context().global.set('somfy_api_access_token', this.accesstoken);
-        this.context().global.set('somfy_api_refresh_token', this.refreshtoken);
     });
 
     RED.httpAdmin.get('/somfy/callback', (request, response) => {
@@ -24,7 +21,7 @@ export = (RED: Red) => {
 
     RED.httpAdmin.get('/somfy/:account/sites', function (req, res) {
         const configNode = RED.nodes.getNode(req.params.account) as any;
-        const somfyApiClient = new SomfyApi(RED, configNode.context, req.params.account);
+        const somfyApiClient = new SomfyApi(RED, configNode, req.params.account);
 
         somfyApiClient.getSites()
             .then((sites: any) => res.json(sites))
@@ -36,7 +33,7 @@ export = (RED: Red) => {
 
     RED.httpAdmin.get('/somfy/:account/site/:siteid/devices', function (req, res) {
         const configNode = RED.nodes.getNode(req.params.account) as any;
-        const somfyApiClient = new SomfyApi(RED, configNode.context, req.params.account);
+        const somfyApiClient = new SomfyApi(RED, configNode, req.params.account);
 
         somfyApiClient.getDevicesForSite(req.params.siteid)
             .then((devices: any) => res.json(devices))
