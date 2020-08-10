@@ -8,6 +8,8 @@ import { INetworkError } from '../interfaces/network-error';
 
 
 export = (RED: Red) => {
+    const EXPECTED_POSITION_BUFFER = 0.05; // 5%
+    const WAIT_FOR_EXPECTED_STATE_DELAY = 5000; // Check every 5 seconds, until expected state is reached.
     const timerRetries = {};
     const waitUntilExpectedState = (account, device, expectedState, jobId): Promise<any> => {
         return new Promise((resolve) => {
@@ -23,15 +25,23 @@ export = (RED: Red) => {
                     .then((deviceState: IDevice) => {
                         const currentPosition = parseInt(
                             deviceState.states.find((state: IDeviceState) => state.name === 'position').value
-                        , 10);
+                            , 10);
 
-                        if (currentPosition === expectedState.position) {
+                        let lowThreshold = expectedState.position * (1 - EXPECTED_POSITION_BUFFER);
+                        let highThreshold = expectedState.position * (1 + EXPECTED_POSITION_BUFFER);
+
+                        if (expectedState.position === 0 || expectedState.position === 100) {
+                            lowThreshold = expectedState.position;
+                            highThreshold = expectedState.position;
+                        }
+
+                        if (currentPosition >= lowThreshold && currentPosition <= highThreshold) {
                             return resolve({ finished: true, deviceState });
                         }
 
                         return resolve({ finished: false, account, device, expectedState });
                     });
-            }, 5000);
+            }, WAIT_FOR_EXPECTED_STATE_DELAY);
         }).then((response: ICommandExecutionFinalState) => {
             if (timerRetries.hasOwnProperty(response.jobId)) {
                 if (timerRetries[response.jobId] === 10 && !response.finished) {
