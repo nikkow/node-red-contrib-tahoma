@@ -57,7 +57,6 @@ export = (RED: Red) => {
     };
 
     RED.nodes.registerType('tahoma', function (this, props) {
-        const config = props as any; // TODO: Handle this differently
         RED.nodes.createNode(this, config);
 
         this.device = config.device;
@@ -106,7 +105,7 @@ export = (RED: Red) => {
                     commandName = 'stop';
                     statusProgressText = 'Stopping...';
                     statusDoneText = 'Stopped';
-                    // expectedState = {open: false, position: 100}; // Not sure what to exspect here
+                    // expectedState = {open: false, position: 100}; // Not sure what to expect here
                     break;
             }
 

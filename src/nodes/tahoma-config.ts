@@ -4,7 +4,6 @@ import { SomfyApi } from '../core/somfy-api';
 
 export = (RED: Red) => {
     RED.nodes.registerType('tahoma-config', function(this, props: any ) {
-        // const config = props as ISomfyCredentialsProperties;
         RED.nodes.createNode(this, props);
         this.apikey = props.apikey;
         this.apisecret = props.apisecret;
@@ -13,9 +12,9 @@ export = (RED: Red) => {
     });
 
     RED.httpAdmin.get('/somfy/callback', (request, response) => {
-        const CALLBACK_BODY = fs.readFileSync(__dirname + '/somfy-callback.html');
+        const callbackBody = fs.readFileSync(__dirname + '/somfy-callback.html');
         response.header('Content-Type', 'text/html');
-        response.write(CALLBACK_BODY.toString());
+        response.write(callbackBody.toString());
         response.send();
     });
 
