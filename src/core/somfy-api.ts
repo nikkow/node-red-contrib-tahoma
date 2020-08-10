@@ -1,18 +1,18 @@
-import { Red } from 'node-red';
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosInstance, AxiosError } from 'axios';
 import { INetworkError } from '../interfaces/network-error';
 import { ICommand } from '../interfaces/command';
 import { IDevice } from '../interfaces/device';
 import { ICommandExecutionResponse } from '../interfaces/command-execution-response';
 import { HttpResponse } from '../enums/http-response.enum';
+import { Node } from 'node-red';
 
 export class SomfyApi {
     private static SOMFY_BASE_URL: string = 'https://api.somfy.com/api/v1';
     private static SOMFY_AUTH_URL: string = 'https://accounts.somfy.com/oauth/oauth/v2';
-    private configNode;
+    private configNode: Node;
     private axiosInstance: AxiosInstance;
 
-    constructor(private readonly RED: Red, configNode, private readonly account: string) {
+    constructor(configNode: Node) {
         this.axiosInstance = axios.create();
         this.configNode = configNode;
 

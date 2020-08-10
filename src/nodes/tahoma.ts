@@ -15,8 +15,8 @@ export = (RED: Red) => {
                 return;
             }
 
-            const configNode = RED.nodes.getNode(account) as any;
-            const somfyApiClient = new SomfyApi(RED, configNode, account);
+            const configNode = RED.nodes.getNode(account);
+            const somfyApiClient = new SomfyApi(configNode);
 
             setTimeout(() => {
                 somfyApiClient.getDevice(device)
