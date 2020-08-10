@@ -122,8 +122,8 @@ export = (RED: Red) => {
 
             this.status({ fill: 'yellow', shape: 'dot', text: statusProgressText });
 
-            const configNode = RED.nodes.getNode(this.tahomabox) as any;
-            const somfyApiClient = new SomfyApi(RED, configNode, this.tahomabox);
+            const configNode = RED.nodes.getNode(this.tahomabox);
+            const somfyApiClient = new SomfyApi(configNode);
 
             somfyApiClient.sendCommandToDevice(this.device, command)
                 .then((commandExecutionFeedback: ICommandExecutionResponse) => {
