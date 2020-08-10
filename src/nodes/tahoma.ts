@@ -57,11 +57,11 @@ export = (RED: Red) => {
     };
 
     RED.nodes.registerType('tahoma', function (this, props) {
-        RED.nodes.createNode(this, config);
+        RED.nodes.createNode(this, props);
 
-        this.device = config.device;
-        this.site = config.site;
-        this.tahomabox = config.tahomabox;
+        this.device = props['device'];
+        this.site = props['site'];
+        this.tahomabox = props['tahomabox'];
 
         this.on('input', (msg: IMessage) => {
             if (typeof msg.payload !== 'object') {
