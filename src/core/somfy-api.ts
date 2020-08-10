@@ -4,13 +4,11 @@ import { INetworkError } from '../interfaces/network-error';
 import { ICommand } from '../interfaces/command';
 import { IDevice } from '../interfaces/device';
 import { ICommandExecutionResponse } from '../interfaces/command-execution-response';
+import { HttpResponse } from '../enums/http-response.enum';
 
 export class SomfyApi {
     private static SOMFY_BASE_URL: string = 'https://api.somfy.com/api/v1';
     private static SOMFY_AUTH_URL: string = 'https://accounts.somfy.com/oauth/oauth/v2';
-    private static HTTP_OK: number = 200;
-    private static HTTP_UNAUTHORIZED: number = 401;
-    private static HTTP_BAD_REQUEST: number = 400;
     private configNode;
     private axiosInstance: AxiosInstance;
 
@@ -30,7 +28,7 @@ export class SomfyApi {
                 return response;
             },
             (error: INetworkError) => {
-                if (error.response.status !== SomfyApi.HTTP_UNAUTHORIZED) {
+                if (error.response.status !== HttpResponse.UNAUTHORIZED) {
                     return Promise.reject(error);
                 }
 
@@ -54,7 +52,7 @@ export class SomfyApi {
                         return Promise.reject(error);
                     })
                     .catch((refreshTokenRequestError: AxiosError) => {
-                        if (refreshTokenRequestError.response.status === SomfyApi.HTTP_BAD_REQUEST) {
+                        if (refreshTokenRequestError.response.status === HttpResponse.BAD_REQUEST) {
                             const refreshTokenRequestErrorData = refreshTokenRequestError.response.data;
                             if (refreshTokenRequestErrorData.hasOwnProperty('message') && refreshTokenRequestErrorData.message === 'error.invalid.grant') {
                                 this.configNode['accesstoken'] = null;
@@ -72,7 +70,7 @@ export class SomfyApi {
     private _request(options: AxiosRequestConfig): Promise<any> {
         return this.axiosInstance(options)
             .then((response: AxiosResponse) => {
-                if (response.status !== SomfyApi.HTTP_OK) {
+                if (response.status !== HttpResponse.OK) {
                     return 'http_error';
                 }
 
