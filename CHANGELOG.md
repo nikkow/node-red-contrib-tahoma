@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- Added error message when automatic session refresh is impossible (see [this article](https://github.com/nikkow/node-red-contrib-tahoma/wiki/Why-do-I-see-a-Session-Expired-error%3F) for more information)
+- Added error message when automatic session refresh is impossible (see [this article](https://github.com/nikkow/node-red-contrib-tahoma#i-received-a-session-expired-error-what-happned) for more information)
 - Added support for blinds rotation for motors that support it ([#33](https://github.com/nikkow/node-red-contrib-tahoma/pull/33), thanks to [@marekhalmo](https://github.com/marekhalmo))
 - Added a buffer when setting a custom position to consider close-enough values as valid ([#34](https://github.com/nikkow/node-red-contrib-tahoma/issues/34))
 
