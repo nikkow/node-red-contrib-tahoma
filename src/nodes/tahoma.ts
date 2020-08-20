@@ -59,8 +59,7 @@ export = (RED: Red) => {
                     state: response.deviceState
                 };
             }
-
-            waitUntilExpectedState(response.tahomabox, response.device, response.expectedState, response.jobId);
+            return waitUntilExpectedState(response.account, response.device, response.expectedState, response.jobId);
         }).catch((error) => {
             this.error(`Cannot refresh Somfy device state. Received the following error: ${error}`);
         });
