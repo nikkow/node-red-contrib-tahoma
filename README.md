@@ -49,6 +49,7 @@ This node accepts an object as input. The following properties will be parsed:
 | -------- | ---- | --------- | ----------- |
 | `action` | enum (see below) | **Yes** | The action to perform |
 | `position` | int (0-100) | *No* | The position you want to set your blinds/door to |
+| `rotation` | int (0-100) | *No* | The rotation you want to set your blinds to |
 | `lowspeed` | boolean | *No* | Should the action be triggered in low-speed mode? |
 
 #### Actions
@@ -59,6 +60,7 @@ Currently, only a few commands are understood by this node. The possible values 
 * `close`: This will close the device
 * `stop`: This will stop all running actions
 * `customPosition`: This will set the device to a custom position. The position is passed using the `position` property, which is required in this mode.
+* `customRotation`: This will set the device (blinds) to a custom rotation. The rotation is passed using the `orientation` property, which is required in this mode.
 
 #### Output
 
@@ -70,7 +72,8 @@ The node will output its original `msg.payload` enriched with the result of the 
 
 ### Node `tahoma-read`
 
-This node does not accept any input. You can specify the desired device by editing the node properties.
+This node will ignore all data provided as input. You can specify the desired device by editing the node properties.
+(Note: you can still trigger a `tahoma-read` instuction periodically by using an `inject` node. See [#28](https://github.com/nikkow/node-red-contrib-tahoma/issues/28#issuecomment-615755280))
 
 #### Output
 

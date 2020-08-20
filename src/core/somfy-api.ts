@@ -1,24 +1,20 @@
-import { Red } from 'node-red';
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosInstance, AxiosError } from 'axios';
 import { INetworkError } from '../interfaces/network-error';
 import { ICommand } from '../interfaces/command';
 import { IDevice } from '../interfaces/device';
 import { ICommandExecutionResponse } from '../interfaces/command-execution-response';
+import { HttpResponse } from '../enums/http-response.enum';
+import { Node } from 'node-red';
 
 export class SomfyApi {
     private static SOMFY_BASE_URL: string = 'https://api.somfy.com/api/v1';
     private static SOMFY_AUTH_URL: string = 'https://accounts.somfy.com/oauth/oauth/v2';
-    private static HTTP_OK: number = 200;
-    private static HTTP_UNAUTHORIZED: number = 401;
-    private static HTTP_BAD_REQUEST: number = 400;
-    private context;
+    private configNode: Node;
     private axiosInstance: AxiosInstance;
 
-    constructor(private readonly RED: Red, context: any, private readonly account: string) {
-        this.context = context;
+    constructor(configNode: Node) {
         this.axiosInstance = axios.create();
-
-        const configNode = this.RED.nodes.getNode(account) as any; // TODO: Type this
+        this.configNode = configNode;
 
         this.axiosInstance.interceptors.request.use(
             (request: AxiosRequestConfig) => {
@@ -32,11 +28,11 @@ export class SomfyApi {
                 return response;
             },
             (error: INetworkError) => {
-                if (error.response.status !== SomfyApi.HTTP_UNAUTHORIZED) {
+                if (error.response.status !== HttpResponse.UNAUTHORIZED) {
                     return Promise.reject(error);
                 }
 
-                const refreshTokenUrl = `${SomfyApi.SOMFY_AUTH_URL}/token?client_id=${configNode.apikey}&client_secret=${configNode.apisecret}&grant_type=refresh_token&refresh_token=${this.getRefreshToken()}`;
+                const refreshTokenUrl = `${SomfyApi.SOMFY_AUTH_URL}/token?client_id=${this.configNode['apikey']}&client_secret=${this.configNode['apisecret']}&grant_type=refresh_token&refresh_token=${this.getRefreshToken()}`;
 
                 return axios({
                         url: refreshTokenUrl,
@@ -47,8 +43,8 @@ export class SomfyApi {
                         }
                     })
                     .then(response => {
-                        this.context().global.set('somfy_api_access_token', response.data.access_token);
-                        this.context().global.set('somfy_api_refresh_token', response.data.refresh_token);
+                        this.configNode['accesstoken'] = response.data.access_token;
+                        this.configNode['refreshtoken'] = response.data.refresh_token;
 
                         this.axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${response.data.access_token}`;
 
@@ -56,11 +52,11 @@ export class SomfyApi {
                         return Promise.reject(error);
                     })
                     .catch((refreshTokenRequestError: AxiosError) => {
-                        if (refreshTokenRequestError.response.status === SomfyApi.HTTP_BAD_REQUEST) {
+                        if (refreshTokenRequestError.response.status === HttpResponse.BAD_REQUEST) {
                             const refreshTokenRequestErrorData = refreshTokenRequestError.response.data;
                             if (refreshTokenRequestErrorData.hasOwnProperty('message') && refreshTokenRequestErrorData.message === 'error.invalid.grant') {
-                                this.context().global.set('somfy_api_access_token', null);
-                                this.context().global.set('somfy_api_refresh_token', null);
+                                this.configNode['accesstoken'] = null;
+                                this.configNode['refreshtoken'] = null;
                                 error.isRefreshTokenExpired = true;
                             }
                         }
@@ -74,7 +70,7 @@ export class SomfyApi {
     private _request(options: AxiosRequestConfig): Promise<any> {
         return this.axiosInstance(options)
             .then((response: AxiosResponse) => {
-                if (response.status !== SomfyApi.HTTP_OK) {
+                if (response.status !== HttpResponse.OK) {
                     return 'http_error';
                 }
 
@@ -86,11 +82,11 @@ export class SomfyApi {
     }
 
     private getAccessToken(): string {
-        return this.context().global.get('somfy_api_access_token');
+        return this.configNode['accesstoken'];
     }
 
     private getRefreshToken(): string {
-        return this.context().global.get('somfy_api_refresh_token');
+        return this.configNode['refreshtoken'];
     }
 
     public getDevice(device: string): Promise<IDevice> {

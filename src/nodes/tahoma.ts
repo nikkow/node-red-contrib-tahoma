@@ -8,6 +8,8 @@ import { INetworkError } from '../interfaces/network-error';
 
 
 export = (RED: Red) => {
+    const EXPECTED_POSITION_BUFFER = 0.05; // 5%
+    const WAIT_FOR_EXPECTED_STATE_DELAY = 5000; // Check every 5 seconds, until expected state is reached.
     const timerRetries = {};
     const waitUntilExpectedState = (account, device, expectedState, jobId): Promise<any> => {
         return new Promise((resolve) => {
@@ -15,23 +17,31 @@ export = (RED: Red) => {
                 return;
             }
 
-            const configNode = RED.nodes.getNode(account) as any;
-            const somfyApiClient = new SomfyApi(RED, configNode.context, account);
+            const configNode = RED.nodes.getNode(account);
+            const somfyApiClient = new SomfyApi(configNode);
 
             setTimeout(() => {
                 somfyApiClient.getDevice(device)
                     .then((deviceState: IDevice) => {
                         const currentPosition = parseInt(
                             deviceState.states.find((state: IDeviceState) => state.name === 'position').value
-                        , 10);
+                            , 10);
 
-                        if (currentPosition === expectedState.position) {
+                        let lowThreshold = expectedState.position * (1 - EXPECTED_POSITION_BUFFER);
+                        let highThreshold = expectedState.position * (1 + EXPECTED_POSITION_BUFFER);
+
+                        if (expectedState.position === 0 || expectedState.position === 100) {
+                            lowThreshold = expectedState.position;
+                            highThreshold = expectedState.position;
+                        }
+
+                        if (currentPosition >= lowThreshold && currentPosition <= highThreshold) {
                             return resolve({ finished: true, deviceState });
                         }
 
                         return resolve({ finished: false, account, device, expectedState });
                     });
-            }, 5000);
+            }, WAIT_FOR_EXPECTED_STATE_DELAY);
         }).then((response: ICommandExecutionFinalState) => {
             if (timerRetries.hasOwnProperty(response.jobId)) {
                 if (timerRetries[response.jobId] === 10 && !response.finished) {
@@ -49,18 +59,18 @@ export = (RED: Red) => {
                     state: response.deviceState
                 };
             }
-
-            waitUntilExpectedState(response.tahomabox, response.device, response.expectedState, response.jobId);
+            return waitUntilExpectedState(response.account, response.device, response.expectedState, response.jobId);
+        }).catch((error) => {
+            this.error(`Cannot refresh Somfy device state. Received the following error: ${error}`);
         });
     };
 
     RED.nodes.registerType('tahoma', function (this, props) {
-        const config = props as any; // TODO: Handle this differently
-        RED.nodes.createNode(this, config);
+        RED.nodes.createNode(this, props);
 
-        this.device = config.device;
-        this.site = config.site;
-        this.tahomabox = config.tahomabox;
+        this.device = props['device'];
+        this.site = props['site'];
+        this.tahomabox = props['tahomabox'];
 
         this.on('input', (msg: IMessage) => {
             if (typeof msg.payload !== 'object') {
@@ -93,11 +103,18 @@ export = (RED: Red) => {
                     statusDoneText = 'Set to ' + msg.payload.position + '%';
                     expectedState = { open: true, position: msg.payload.position };
                     break;
+                case 'customRotation':
+                    commandName = 'rotation';
+                    parameters = [{ name: 'orientation', value: parseInt(msg.payload.orientation, 10) }];
+                    statusProgressText = 'Rotating to ' + msg.payload.orientation + '°...';
+                    statusDoneText = 'Rotated to ' + msg.payload.orientation + '°';
+                    expectedState = { orientation: msg.payload.orientation };
+                    break;
                 case 'stop':
                     commandName = 'stop';
                     statusProgressText = 'Stopping...';
                     statusDoneText = 'Stopped';
-                    // expectedState = {open: false, position: 100}; // Not sure what to exspect here
+                    // expectedState = {open: false, position: 100}; // Not sure what to expect here
                     break;
             }
 
@@ -114,7 +131,8 @@ export = (RED: Red) => {
 
             this.status({ fill: 'yellow', shape: 'dot', text: statusProgressText });
 
-            const somfyApiClient = new SomfyApi(RED, this.context, this.tahomabox);
+            const configNode = RED.nodes.getNode(this.tahomabox);
+            const somfyApiClient = new SomfyApi(configNode);
 
             somfyApiClient.sendCommandToDevice(this.device, command)
                 .then((commandExecutionFeedback: ICommandExecutionResponse) => {
@@ -126,26 +144,31 @@ export = (RED: Red) => {
 
                     const jobId = commandExecutionFeedback.job_id;
 
-                    waitUntilExpectedState(this.tahomabox, this.device, expectedState, jobId).then((finalState) => {
-                        this.status({
-                            fill: finalState.finished ? 'green' : 'red',
-                            shape: 'dot',
-                            text: statusDoneText
+                    waitUntilExpectedState(this.tahomabox, this.device, expectedState, jobId)
+                        .then((finalState) => {
+                            this.status({
+                                fill: finalState.finished ? 'green' : 'red',
+                                shape: 'dot',
+                                text: statusDoneText
+                            });
+
+                            if (!('payload' in msg)) {
+                                msg.payload = {};
+                            }
+
+                            // - DEPRECATED: The output is there for backwards compatibility.
+                            // - it will be removed and msg.payload.states must be used instead.
+                            msg.payload.output = expectedState || { open: true };
+                            msg.payload.states = finalState.state.states;
+
+                            this.send(msg);
+                        })
+                        .catch((error) => {
+                            this.error(`Cannot refresh Somfy device state. Received the following error: ${error}`);
                         });
-
-                        if (!('payload' in msg)) {
-                            msg.payload = {};
-                        }
-
-                        // - DEPRECATED: The output is there for backwards compatibility.
-                        // - it will be removed and msg.payload.states must be used instead.
-                        msg.payload.output = expectedState || { open: true };
-                        msg.payload.states = finalState.state.states;
-
-                        this.send(msg);
-                    });
                 })
                 .catch((error: INetworkError) => {
+                    this.error(`Token has expired. The renewas didn't happen as expected. Do not hesitate to create an issue on Github.`);
                     if (error.isRefreshTokenExpired) {
                         this.error('Session has expired and refresh token is no longer active. You need to login again through the config node to perform this action.');
                         this.status({
