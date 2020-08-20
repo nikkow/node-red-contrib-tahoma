@@ -46,6 +46,7 @@
 					$("#node-input-site").prop('disabled', false);
 					loadDevices();
 				}, function(error) {
+					if(error.status === 401) { $("#_session_exp_error").show(); }
 					$("#node-input-site").empty().prop('disabled', true).html(`<option value="${selected_site}">${selected_site}</option>`);
 					$("#node-input-device").empty().prop('disabled', true).html(`<option value="${selected_device}">${selected_device}</option>`);;
 				});
@@ -81,6 +82,7 @@
 					$("#node-input-device").empty().html(html);
 					$("#node-input-device").prop('disabled', false);
 				}, function(error) {
+					if(error.status === 401) { $("#_session_exp_error").show(); }
 					$("#node-input-device").empty().prop('disabled', true).html(`<option value="${selected_device}">${selected_device}</option>`);;
 				});
 			}
@@ -93,13 +95,18 @@
 </script>
 
 <script type="text/x-red" data-template-name="tahoma-read">
+	<div style="font-weight: normal; color: #AD1625; margin-bottom: 15px; display: none;" id="_session_exp_error">
+		<b><i class="fa fa-tag"></i> Session Expired</b><br />
+		Your session has expired and could not be automatically refreshed. This happens after a long period of inactivity. You can check <a href="https://github.com/nikkow/node-red-contrib-tahoma/wiki/Why-do-I-see-a-Session-Expired-error%3F" target="_blank">this article</a> for more information.
+	</div>
 	<div class="form-row">
 		<label for="node-input-name"><i class="icon-tag"></i> Name</label>
 		<input type="text" id="node-input-name">
 	</div>
 	<div class="form-row">
         <label for="node-input-tahomabox"><i class="icon-tag"></i> Account</label>
-        <input type="text" id="node-input-tahomabox">
+				<input type="text" id="node-input-tahomabox">
+				<div style="font-weight: bold; color: red;">Your session has expired and could not be automatically refreshed. Please log-in again.</div>
 	</div>
 	<div class="form-row">
 		<label for="node-input-site"><i class="icon-tag"></i> Site</label>

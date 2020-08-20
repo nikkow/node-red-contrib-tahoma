@@ -1,6 +1,7 @@
 import { Red } from 'node-red';
 import * as fs from 'fs';
 import { SomfyApi } from '../core/somfy-api';
+import { HttpResponse } from '../enums/http-response.enum';
 
 export = (RED: Red) => {
     RED.nodes.registerType('tahoma-config', function(this, props: any ) {
@@ -24,8 +25,8 @@ export = (RED: Red) => {
 
         somfyApiClient.getSites()
             .then((sites: any) => res.json(sites))
-            .catch(() => {
-                res.status(500);
+            .catch((error) => {
+                res.status(error.isRefreshTokenExpired ? HttpResponse.UNAUTHORIZED : HttpResponse.SERVER_ERROR);
                 res.send();
             });
     });
@@ -36,8 +37,8 @@ export = (RED: Red) => {
 
         somfyApiClient.getDevicesForSite(req.params.siteid)
             .then((devices: any) => res.json(devices))
-            .catch(() => {
-                res.status(500);
+            .catch((error) => {
+                res.status(error.isRefreshTokenExpired ? HttpResponse.UNAUTHORIZED : HttpResponse.SERVER_ERROR);
                 res.send();
             });
     });
