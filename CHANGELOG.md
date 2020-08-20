@@ -1,15 +1,18 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [2.0.2] - xxx
+## [2.0.2] - 2020-08-20
 
 ### Added
 
-- Added support for blinds rotation for motors that support it (See [#33](https://github.com/nikkow/node-red-contrib-tahoma/pull/33), thanks to [@marekhalmo](https://github.com/marekhalmo))
+- Added error message when automatic session refresh is impossible (see [this article](https://github.com/nikkow/node-red-contrib-tahoma#i-received-a-session-expired-error-what-happned) for more information)
+- Added support for blinds rotation for motors that support it ([#33](https://github.com/nikkow/node-red-contrib-tahoma/pull/33), thanks to [@marekhalmo](https://github.com/marekhalmo))
+- Added a buffer when setting a custom position to consider close-enough values as valid ([#34](https://github.com/nikkow/node-red-contrib-tahoma/issues/34))
 
 ### Changed
 
 - Fixed an issue that prevented tokens from being correctly refreshed
+- Fixed an unhandled Promise rejection ([#31](https://github.com/nikkow/node-red-contrib-tahoma/issues/31))
 
 ### Refactoring
 
@@ -19,7 +22,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Fix publication to NPM registry issue (See [#20](https://github.com/nikkow/node-red-contrib-tahoma/issues/20))
+- Fix publication to NPM registry issue ([#20](https://github.com/nikkow/node-red-contrib-tahoma/issues/20))
 
 ## [2.0.0] - 2020-03-01
 
@@ -47,17 +50,17 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Fix missing break statement (See [#8](https://github.com/nikkow/node-red-contrib-tahoma/pull/8), thanks to [@taucher4000](https://github.com/taucher4000))
+- Fix missing break statement ([#8](https://github.com/nikkow/node-red-contrib-tahoma/pull/8), thanks to [@taucher4000](https://github.com/taucher4000))
 - Fix login strategy, preventing "Too Many Requests" error returned by Somfy (See [#9](https://github.com/nikkow/node-red-contrib-tahoma/issues/9))
 
 ## [0.2.0] - 2018-10-21
 
 ### Added
 
-- New node `tahoma-read` (See [#6](https://github.com/nikkow/node-red-contrib-tahoma/issues/6))
-- New `stop` action to immediatly stop the current action on the devices (See [#5](https://github.com/nikkow/node-red-contrib-tahoma/pull/5), thanks to [@Genosse274](https://github.com/Genosse274))
+- New node `tahoma-read` ([#6](https://github.com/nikkow/node-red-contrib-tahoma/issues/6))
+- New `stop` action to immediatly stop the current action on the devices ([#5](https://github.com/nikkow/node-red-contrib-tahoma/pull/5), thanks to [@Genosse274](https://github.com/Genosse274))
 - New CHANGELOG.md file to keep track of all updates.
 
 ### Changed
 
-- Fix path in getSetup() (See [#7](https://github.com/nikkow/node-red-contrib-tahoma/pull/7), thanks to [@hobbyquaker](https://github.com/hobbyquaker))
+- Fix path in getSetup() ([#7](https://github.com/nikkow/node-red-contrib-tahoma/pull/7), thanks to [@hobbyquaker](https://github.com/hobbyquaker))
