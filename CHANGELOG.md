@@ -6,10 +6,12 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - Added support for blinds rotation for motors that support it (See [#33](https://github.com/nikkow/node-red-contrib-tahoma/pull/33), thanks to [@marekhalmo](https://github.com/marekhalmo))
+- Added a buffer when setting a custom position to consider close-enough values as valid (See [#34](https://github.com/nikkow/node-red-contrib-tahoma/issues/34))
 
 ### Changed
 
 - Fixed an issue that prevented tokens from being correctly refreshed
+- Fixed an unhandled Promise rejection ([#31](https://github.com/nikkow/node-red-contrib-tahoma/issues/31))
 
 ### Refactoring
 
