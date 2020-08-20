@@ -6,7 +6,7 @@ export interface ICommandExecutionResponse {
 
 export interface ICommandExecutionFinalState {
     finished: boolean;
-    tahomabox?: string;
+    account?: string;
     device?: string;
     expectedState?: object;
     jobId?: string;
