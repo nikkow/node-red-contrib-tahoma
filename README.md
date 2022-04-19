@@ -11,11 +11,15 @@
 ![license](https://img.shields.io/github/license/nikkow/node-red-contrib-tahoma.svg)
 ![code size](https://img.shields.io/github/languages/code-size/nikkow/node-red-contrib-tahoma)
 
-## 🚨 Important Note vor v1.x users
+## 🚨 Important Note vor v2.x and v1.x users
 
-Due to a recent change in the API used in v1, most of you were encountering issues during the configuration of your node (e.g. empty device list...). **This API was unofficial and we had no control over it** :) 
+This 3rd version implements a new API released by Somfy (yes, another one). This time, it no longer relies on any cloud-based API, but will directly discuss with your local Tahoma box.
 
-This new v2.0 version implements the Somfy Open API, which is officially available for third-party software as this one.
+#### What does this mean?
+
+Basically, the only requirement is to host the node-red instance on the same network than your Tahoma box. That's all. No more quotas, no more expiring tokens. Good news, isn't it?
+
+#### How to upgrade?
 
 Even though your flows should not be modified, the [config-node](https://nodered.org/docs/user-guide/editor/workspace/nodes#configuration-nodes) must be reconfigured using this new API.
 
@@ -33,11 +37,11 @@ This software is provided **as-is**. Be careful: your devices can be fully contr
 
 ## Configuration
 
-In order to use this node, you need to have a Somfy account. If you already use the Tahoma Box and the mobile apps, you should have one.
+This node relies on the Local API provided by Somfy, and available on the Tahoma box (from v2 onwards -as per Somfy documentation). 
 
-You will also need to create an app on the developer portal in order to retrieve a set of required credentials. This [guide](https://github.com/nikkow/node-red-contrib-tahoma/wiki/How-to-create-an-Somfy-Open-API-app%3F) will walk you through this process.
+You will need to **enable the developer mode** on your Somfy account to use this module. This [guide](https://github.com/nikkow/node-red-contrib-tahoma/wiki/How-to-enable-the-developer-mode%3F) will walk you through this process.
 
-When creating your first node, you will be asked to provide your e-mail and password used to login to your Somfy account. These will be used to connect to the API (of course, they will only be used locally, they are not forwarded to me :)).
+When creating your first node, you will be asked to provide your e-mail and password used to login to your Somfy account. These will be used to generate a token to interact with your box (they will not be saved at all on your instance). The pin code of your box will also be required. This information is available on your Somfy account.
 
 ## Usage
 
@@ -77,7 +81,7 @@ This node will ignore all data provided as input. You can specify the desired de
 
 #### Output
 
-The node will output its original `msg.payload` enriched with the selected device information. A full example can be found on the Somfy Open API [documentation](https://developer.somfy.com/somfy-open-api/apis/get/site/%7BsiteId%7D/device).
+The node will output its original `msg.payload` enriched with the selected device information. The fields returned are the raw information sent by the Tahoma box.
 
 ## Example flow
 
@@ -94,29 +98,3 @@ This was tested with the following devices:
 * Sunea IO Awning (thanks to @xeor)
 
 Feel free to send any feedback of any other compatible items or known limitations :)
-
-## FAQ / Troubleshooting
-
-### I received a "Session expired" error, what happned?
-
-![Session expired error](docs/images/ts-session-expired-node.png) 
-
-During the login process, Somfy generates a set of credentials composed of two tokens: the first is called an **access token** and the second a **refresh token** (following the [OAuth2](https://oauth.net/2/) protocol). 
-
-Both these tokens expire at some point. 
-
-The **access token** (used to authenticate each request sent to Somfy API) has a very short lifetime (1 hour) and needs to be regenerated afterwards. To prevent you from entering your e-mail/password each hour, the **refresh token** handles this new authentication. Whenever the access token expires, a new authentication request is sent and Somfy generates a brand-new set of tokens.
-
-However, the **refresh token** has not an infinite lifetime. It expires after **14 days**. Basically, it means that if node-red hasn't reached the Somfy API for 14 days + 1 hour, both your token have expired and you need to login again. 
-
-#### What should I do?
-
-This error is also described in the "Debug" tab of your node:
-
-![Session expired error](docs/images/ts-session-expired-log.png) 
-
-All you need to do is open your node configuration, edit your account and follow the instructions on the yellow box:
-
-![Yellow box](docs/images/ts-session-expires-tip.png)
-
-**Note:** do not forget to **deploy** your flow, so the new credentials are properly saved. 

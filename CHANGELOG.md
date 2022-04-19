@@ -12,7 +12,8 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Connected the module to the new Local API released by Somfy
+- Migration to the new Local API, replacing the cloud-based Somfy Open API.
+- `tahoma-read` node returns the raw data retrieved from the local API. (a remapping of your flows might be needed)
 - Upgraded the dependencies to their latest versions
 - Replaced TSLint with ESLint
 
