@@ -1,142 +1,114 @@
 <script type="text/javascript">
-    RED.nodes.registerType('tahoma',{
-        category: 'function',
-        color: '#E2D96E',
-		defaults: {
-			tahomabox: { value: "", type: "tahoma-config" },
-			name: { value: "" },
-			site: { value: "" },
-			device: { value: "" }
-		},
-        inputs: 1,
-		outputs: 1,
-		align: 'right',
-        icon: 'bridge-dash.png',
-        label: function() {
-            return this.name || "Tahoma Controllable Element";
-        },
-		labelStyle: function() {
-    		return this.name ? "node_label_italic" : "";
-		},
-		oneditprepare: function generateEditForm() {
-			var selected_site = $("#node-input-site").val();
-			var selected_device = $("#node-input-device").val();
+  RED.nodes.registerType('tahoma', {
+    category: 'function',
+    color: '#E2D96E',
+    defaults: {
+      tahomabox: { value: '', type: 'tahoma-config' },
+      name: { value: '' },
+      device: { value: '' },
+    },
+    inputs: 1,
+    outputs: 1,
+    align: 'right',
+    icon: 'bridge-dash.png',
+    label: function () {
+      return this.name || 'Tahoma Controllable Element';
+    },
+    labelStyle: function () {
+      return this.name ? 'node_label_italic' : '';
+    },
+    oneditprepare: function generateEditForm() {
+      var selected_device = $('#node-input-device').val();
 
-			$("#node-input-device").replaceWith('<select id="node-input-device" name="node-input-device" style="width: 250px;">');
-			$("#node-input-site").replaceWith('<select id="node-input-site" name="node-input-site" style="width: 250px;">');
+      $('#node-input-device').replaceWith(
+        '<select id="node-input-device" name="node-input-device" style="width: 250px;">',
+      );
 
-			var loadSites = function() {
-				const tahoma_account_id = $("#node-input-tahomabox").val().trim();
-				if(tahoma_account_id === '_ADD_') {
-					$("#node-input-site").empty().html('<option value="_NO_SITE_" selected="selected">No sites found.</option>');
-					return;
-				}
+      var loadDevices = function () {
+        const tahoma_account_id = $('#node-input-tahomabox').val();
+        if (tahoma_account_id === '_ADD_') {
+          $('#node-input-device')
+            .empty()
+            .html(
+              '<option value="_NO_DEVICE_" selected="selected">No devices found.</option>',
+            );
+          return;
+        }
 
-				$.get('/somfy/' + tahoma_account_id + '/sites').then(function(sites, statusCode) {
-					if(!sites || sites.length === 0) {
-						$("#node-input-site").empty().html('<option value="_NO_SITE_" selected="selected">No sites found.</option>');
-						return;
-					}
+        $.get(`/somfy/${tahoma_account_id}/devices`).then(function (
+          devices,
+          statusCode,
+        ) {
+          if (!devices || devices.length === 0) {
+            $('#node-input-device')
+              .empty()
+              .html(
+                '<option value="_NO_DEVICE_" selected="selected">No devices found.</option>',
+              );
+            return;
+          }
 
-					var html = '';
-					$.each(sites, function( key, value ) {
-						var selected = (value.id === selected_site) ? 'selected="selected"' : '';
-						html += '<option value="'+ value.id +'"'+ selected +'>'+value.label+'</option>';
-					});
-					$("#node-input-site").empty().html(html);
-					$("#node-input-site").prop('disabled', false);
-					loadDevices();
-				}, function(error) {
-					if(error.status === 401) { $("#_session_exp_error").show(); }
-					$("#node-input-site").empty().prop('disabled', true).html(`<option value="${selected_site}">${selected_site}</option>`);
-					$("#node-input-device").empty().prop('disabled', true).html(`<option value="${selected_device}">${selected_device}</option>`);;
-				});
-			}
+          var html = '';
 
-			var loadDevices = function() {
-				const tahoma_account_id = $("#node-input-tahomabox").val();
-				if(tahoma_account_id === '_ADD_') {
-					$("#node-input-device").empty().html('<option value="_NO_DEVICE_" selected="selected">No devices found.</option>');
-					return;
-				}
-				const tahoma_site_id = $("#node-input-site").val();
-				if(tahoma_site_id === '_NO_SITE_' || tahoma_site_id === null) {
-					$("#node-input-device").empty().html('<option value="_NO_DEVICE_" selected="selected">No devices found.</option>');
-					return;
-				}
+          $.each(devices, function (key, value) {
+            if (value && value.name) {
+              var selected =
+                value.id === selected_device ? 'selected="selected"' : '';
+              html +=
+                '<option value="' +
+                value.id +
+                '"' +
+                selected +
+                '>' +
+                value.name +
+                '</option>';
+            }
+          });
 
-				$.get('/somfy/' + tahoma_account_id + '/site/'+ tahoma_site_id +'/devices').then(function(devices, statusCode) {
-					if(!devices || devices.length === 0) {
-						$("#node-input-device").empty().html('<option value="_NO_DEVICE_" selected="selected">No devices found.</option>');
-						return;
-					}
+          $('#node-input-device').empty().html(html);
+          $('#node-input-device').prop('disabled', false);
+        });
+      };
 
-					var html = '';
-
-					$.each(devices, function( key, value ) {
-						if(value && value.name) {
-							var selected = (value.id === selected_device) ? 'selected="selected"' : '';
-							html += '<option value="'+ value.id +'"'+ selected +'>'+value.name+'</option>';
-						}
-					});
-
-					$("#node-input-device").empty().html(html);
-					$("#node-input-device").prop('disabled', false);
-				}, function(error) {
-					if(error.status === 401) { $("#_session_exp_error").show(); }
-					$("#node-input-device").empty().prop('disabled', true).html(`<option value="${selected_device}">${selected_device}</option>`);;
-				});
-			}
-
-			$("#node-input-tahomabox").on('change', loadSites);
-			$("#node-input-site").on('change', loadDevices);
-			loadSites();
-		}
-	});
+      $('#node-input-tahomabox').on('change', loadDevices);
+      loadDevices();
+    },
+  });
 </script>
 
 <script type="text/x-red" data-template-name="tahoma">
-	<div style="font-weight: normal; color: #AD1625; margin-bottom: 15px; display: none;" id="_session_exp_error">
-		<b><i class="fa fa-tag"></i> Session Expired</b><br />
-		Your session has expired and could not be automatically refreshed. This happens after a long period of inactivity. You can check <a href="https://github.com/nikkow/node-red-contrib-tahoma#i-received-a-session-expired-error-what-happned" target="_blank">this article</a> for more information.
-	</div>
-	<div class="form-row">
-		<label for="node-input-name"><i class="icon-tag"></i> Name</label>
-		<input type="text" id="node-input-name">
-	</div>
-	<div class="form-row">
-		<label for="node-input-tahomabox"><i class="icon-tag"></i> Account</label>
-		<input type="text" id="node-input-tahomabox">
-	</div>
-	<div class="form-row">
-		<label for="node-input-site"><i class="icon-tag"></i> Site</label>
-		<input type="text" id="node-input-site">
-	</div>
-	<div class="form-row">
-		<label for="node-input-device"><i class="icon-tag"></i> Device</label>
-		<input type="text" id="node-input-device">
-	</div>
+  <div class="form-row">
+  	<label for="node-input-name"><i class="icon-tag"></i> Name</label>
+  	<input type="text" id="node-input-name">
+  </div>
+  <div class="form-row">
+  	<label for="node-input-tahomabox"><i class="icon-tag"></i> Account</label>
+  	<input type="text" id="node-input-tahomabox">
+  </div>
+  <div class="form-row">
+  	<label for="node-input-device"><i class="icon-tag"></i> Device</label>
+  	<input type="text" id="node-input-device">
+  </div>
 </script>
 
 <script type="text/x-red" data-help-name="tahoma">
-    <p>Sends a command to a Somfy equipment.</p>
+  <p>Sends a command to a Somfy device.</p>
 
-	<h3>Inputs</h3>
-    <dl class="message-properties">
-		<dt>action <span class="property-type">string</span></dt>
-		<dd>this can take one of the following values: <code>open</code>, <code>close</code>, <code>stop</code> or <code>customPosition</code></dd>
-		<dt>position <span class="property-type">integer (0-100)</span></dt>
-		<dd>this applies for <code>customPosition</code> actions. this actually determines the opening percentage to apply (100 = fully closed)</dd>
-		<dt>lowspeed <span class="property-type">boolean</span></dt>
-		<dd>for compatible systems, sends the command as lowspeed, to decrease the speed of the wanted action. Default: false</dd>
-	</dl>
+  <h3>Inputs</h3>
+  <dl class="message-properties">
+    <dt>action <span class="property-type">string</span></dt>
+    <dd>this can take one of the following values: <code>open</code>, <code>close</code>, <code>stop</code> or <code>customPosition</code></dd>
+    <dt>position <span class="property-type">integer (0-100)</span></dt>
+    <dd>this applies for <code>customPosition</code> actions. this actually determines the opening percentage to apply (100 = fully closed)</dd>
+    <dt>lowspeed <span class="property-type">boolean</span></dt>
+    <dd>for compatible systems, sends the command as lowspeed, to decrease the speed of the wanted action. Default: false</dd>
+  </dl>
 
- 	<h3>Outputs</h3>
-	<p>The outputted <code>msg.payload</code> will contain the full device state, as it would be returned by the <i>Read</i> node. For backwards compatbility, it still returns the <code>open</code> (boolean), <code>position</code> (integer, 0-100) and <code>luminance</code> properties.</p>
+  <h3>Outputs</h3>
+  <p>The outputted <code>msg.payload</code> will contain the full device state, as it would be returned by the <i>Read</i> node.</p>
 
-	<h3>References</h3>
-    <ul>
-        <li><a href="https://developer.somfy.com/somfy-open-api/apis/get/site/%7BsiteId%7D/device" target="_blank">Somfy OpenAPI Reference</a> - full schema</li>
-        <li><a href="https://github.com/nikkow/node-red-tahoma" target="_blank">GitHub</a> - the nodes github repository</li>
-    </ul>
+  <h3>References</h3>
+     <ul>
+         <li><a href="https://github.com/nikkow/node-red-tahoma" target="_blank">GitHub</a> - the nodes github repository</li>
+     </ul>
 </script>

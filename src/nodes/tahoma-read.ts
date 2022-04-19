@@ -1,41 +1,25 @@
+import * as nodered from 'node-red';
 import { SomfyApi } from '../core/somfy-api';
-import { NodeProperties, Red, Node } from 'node-red';
-import { INodeConfiguration } from '../interfaces/node-config';
-import { IMessage } from '../interfaces/message';
-import { INetworkError } from '../interfaces/network-error';
+import { TahomaNodeDef } from './tahoma.def';
 
-export = (RED: Red) => {
-    RED.nodes.registerType('tahoma-read', function (this, props) {
-        // TODO: The two typings below are quite ugly, but this is the only way I managed to properly cast them.
-        const config: INodeConfiguration = props as unknown as INodeConfiguration;
-        RED.nodes.createNode(this, (config as unknown as NodeProperties));
+export = (RED: nodered.NodeAPI) => {
+  RED.nodes.registerType(
+    'tahoma-read',
+    function (this: nodered.Node, props: TahomaNodeDef) {
+      RED.nodes.createNode(this, props);
+      const config = RED.nodes.getNode(props['tahomabox']);
 
-        this.device = config.device;
-        this.site = config.site;
-        this.tahomabox = config.tahomabox;
+      this['device'] = props.device;
+      this['tahomabox'] = props.tahomabox;
+      this['name'] = props.name;
 
-        this.on('input', (msg: IMessage) => {
-            const configNode = RED.nodes.getNode(this.tahomabox) as Node;
-            const somfyApiClient = new SomfyApi(configNode);
-
-            somfyApiClient.getDevice(this.device)
-                .then((deviceData) => {
-                    msg.payload = deviceData;
-                    this.send(msg);
-                })
-                .catch((error: INetworkError) => {
-                    if (error.isRefreshTokenExpired) {
-                        this.error('Session has expired and refresh token is no longer active. You need to login again through the config node to perform this action.');
-                        this.status({
-                            fill: 'red',
-                            shape: 'dot',
-                            text: 'Session expired. See debug tab for more info'
-                        });
-                    }
-
-                    msg.payload = null;
-                    this.send(msg);
-                });
+      this.on('input', (msg: nodered.NodeMessage) => {
+        const somfyClient = new SomfyApi(config);
+        somfyClient.getDevice(this['device']).then((deviceData) => {
+          msg.payload = deviceData;
+          this.send(msg);
         });
-    });
+      });
+    },
+  );
 };
