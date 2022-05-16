@@ -2,8 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
-## [3.0.0] -
+## [3.0.0-beta.1] - 2022-05-16
 
+---
+
+⚠️ This release is a **beta** release. Use it at your own risk.
+
+---
 ---
 
 🚨 **This release is a major version and contains some breaking changes. Please read the list below.**
