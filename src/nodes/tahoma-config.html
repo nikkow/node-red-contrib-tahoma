@@ -13,6 +13,9 @@
       if (this.token) {
         $('.hidden-on-ok').hide();
         $('.shown-on-ok').show();
+      } else {
+        $('.hidden-on-ok').show();
+        $('.shown-on-ok').hide();
       }
 
       const LOGIN_URL =
@@ -32,6 +35,10 @@
             $('#node-config-input-token').val(response.token);
             $('.hidden-on-ok').hide();
             $('.shown-on-ok').show();
+            $('.form-error').hide();
+          },
+          error: () => {
+            $('.form-error').show();
           },
         });
       });
@@ -65,6 +72,8 @@
     <label for="node-config-input-token"><i class="icon-bookmark"></i> Token:</label>
     <input type="text" disabled="disabled" id="node-config-input-token">
   </div>
+
+  <div class="form-error" style="border:  1px solid #AD1625;padding:  10px;color:  #AD1625;margin-bottom: 10px; display: none;">An error occurred. Please ensure your credentials and PIN code are correct.</div>
 
   <button class="api-credentials api-link hidden-on-ok">Create Connection</button>
   <button class="api-credentials-reset shown-on-ok">Generate new token</button>
