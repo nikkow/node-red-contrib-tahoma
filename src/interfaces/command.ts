@@ -1,9 +1,9 @@
 export interface ICommand {
-    name: string;
-    parameters?: ICommandParameter[];
+  name: string;
+  parameters?: ICommandParameter[];
 }
 
 export interface ICommandParameter {
-    name: string;
-    value: any;
+  name: string;
+  value: any;
 }

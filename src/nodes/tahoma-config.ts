@@ -1,45 +1,64 @@
-import { Red } from 'node-red';
-import * as fs from 'fs';
+import * as nodered from 'node-red';
 import { SomfyApi } from '../core/somfy-api';
 import { HttpResponse } from '../enums/http-response.enum';
+import { TahomaConfigNodeDef } from './tahoma-config.def';
+import { IDevice } from '../interfaces/device';
 
-export = (RED: Red) => {
-    RED.nodes.registerType('tahoma-config', function(this, props: any ) {
-        RED.nodes.createNode(this, props);
-        this.apikey = props.apikey;
-        this.apisecret = props.apisecret;
-        this.accesstoken = props.accesstoken;
-        this.refreshtoken = props.refreshtoken;
-    });
+export = (RED: nodered.NodeAPI): void => {
+  RED.nodes.registerType(
+    'tahoma-config',
+    function (
+      this: nodered.Node<TahomaConfigNodeDef>,
+      props: TahomaConfigNodeDef,
+    ) {
+      RED.nodes.createNode(this, props);
+      this['pin'] = props.pin;
+      this['name'] = props.name;
+      this['token'] = props.token;
+    },
+  );
 
-    RED.httpAdmin.get('/somfy/callback', (request, response) => {
-        const callbackBody = fs.readFileSync(__dirname + '/somfy-callback.html');
-        response.header('Content-Type', 'text/html');
-        response.write(callbackBody.toString());
-        response.send();
-    });
+  RED.httpAdmin.post('/somfy/get-token', async (request, response) => {
+    const { userId, userPassword, tahomaPin } = request.body;
+    const token = await SomfyApi.getLocalToken(userId, userPassword, tahomaPin);
 
-    RED.httpAdmin.get('/somfy/:account/sites', function (req, res) {
-        const configNode = RED.nodes.getNode(req.params.account);
-        const somfyApiClient = new SomfyApi(configNode);
+    if (token === null) {
+      response.status(HttpResponse.BAD_REQUEST);
+      response.send();
+      return;
+    }
 
-        somfyApiClient.getSites()
-            .then((sites: any) => res.json(sites))
-            .catch((error) => {
-                res.status(error.isRefreshTokenExpired ? HttpResponse.UNAUTHORIZED : HttpResponse.SERVER_ERROR);
-                res.send();
-            });
-    });
+    response.json({ token });
+  });
 
-    RED.httpAdmin.get('/somfy/:account/site/:siteid/devices', function (req, res) {
-        const configNode = RED.nodes.getNode(req.params.account);
-        const somfyApiClient = new SomfyApi(configNode);
+  RED.httpAdmin.get('/somfy/:account/devices', function (req, res) {
+    const configNode = RED.nodes.getNode(req.params.account);
+    const somfyApiClient = new SomfyApi(configNode);
 
-        somfyApiClient.getDevicesForSite(req.params.siteid)
-            .then((devices: any) => res.json(devices))
-            .catch((error) => {
-                res.status(error.isRefreshTokenExpired ? HttpResponse.UNAUTHORIZED : HttpResponse.SERVER_ERROR);
-                res.send();
-            });
-    });
+    somfyApiClient
+      .getDevices()
+      .then((devices: IDevice[]) => {
+        res.json(
+          devices
+            .filter((device) => {
+              return (
+                device.controllableName !== 'io:StackComponent' &&
+                device.enabled &&
+                device.available &&
+                device.synced
+              );
+            })
+            .map((device) => {
+              return {
+                id: device.deviceURL,
+                name: device.label,
+              };
+            }),
+        );
+      })
+      .catch(() => {
+        res.status(HttpResponse.SERVER_ERROR);
+        res.send();
+      });
+  });
 };

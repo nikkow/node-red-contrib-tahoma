@@ -1,5 +1,25 @@
 # Changelog
+
 All notable changes to this project will be documented in this file.
+
+## [3.0.0] -
+
+---
+
+🚨 **This release is a major version and contains some breaking changes. Please read the list below.**
+
+---
+
+### Changed
+
+- Migration to the new Local API, replacing the cloud-based Somfy Open API.
+- `tahoma-read` node returns the raw data retrieved from the local API. (a remapping of your flows might be needed)
+- Upgraded the dependencies to their latest versions
+- Replaced TSLint with ESLint
+
+### Removed
+
+- Removed deprecated properties on the Tahoma node
 
 ## [2.0.3] - 2020-08-20
 
@@ -26,9 +46,11 @@ All notable changes to this project will be documented in this file.
 
 ## [2.0.0] - 2020-03-01
 
-****
+---
+
 🚨 **This release is a major version and contains some breaking changes. Please read the list below.**
-****
+
+---
 
 ### Changed
 
@@ -38,7 +60,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- New code quality control using TSLint 
+- New code quality control using TSLint
 
 ## [1.0.1] - 2019-08-21
 

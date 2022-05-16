@@ -1,28 +1,12 @@
 export interface IDevice {
-    id: string;
-    type: string;
-    parent_id: string;
-    categories: string[];
-    states: IDeviceState[];
-    capabilities: IDeviceCapability[];
-    site_id: string;
-    name: string;
-    available: boolean;
-    version?: string;
+  deviceURL: string;
+  available: boolean;
+  synced: boolean;
+  label: string;
+  enabled: boolean;
+  controllableName: string;
 }
 
-export interface IDeviceState {
-    name: string;
-    value: any;
-    type: string;
-}
-
-export interface IDeviceCapability {
-    name: string;
-    parameters: IDeviceCapabilityParameter[];
-}
-
-export interface IDeviceCapabilityParameter {
-    name: string;
-    type: string;
-}
+// Note: other fields are available, but not used in this plugin.
+// If you are contributing to this module and need an additional field,
+// feel free to add it :).
