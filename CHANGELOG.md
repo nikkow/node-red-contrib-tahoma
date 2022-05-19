@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.0-beta.4] - 2022-05-19
+
+---
+
+⚠️ This release is a **beta** release. Use it at your own risk.
+
+---
+
+---
+
+🚨 **This release is a major version and contains some breaking changes. Please read the list below.**
+
+---
+
+### Added
+
+- Auto discovery of the Tahoma box using Bonjour
+
 ## [3.0.0-beta.3] - 2022-05-17
 
 ---
@@ -9,6 +27,7 @@ All notable changes to this project will be documented in this file.
 ⚠️ This release is a **beta** release. Use it at your own risk.
 
 ---
+
 ---
 
 🚨 **This release is a major version and contains some breaking changes. Please read the list below.**
@@ -19,8 +38,7 @@ All notable changes to this project will be documented in this file.
 
 - Package of 3.0.0-beta.1 was not complete (ignored files on publication)
 
-
-## [3.0.0-beta.2] 
+## [3.0.0-beta.2]
 
 _Skipped_
 
@@ -31,6 +49,7 @@ _Skipped_
 ⚠️ This release is a **beta** release. Use it at your own risk.
 
 ---
+
 ---
 
 🚨 **This release is a major version and contains some breaking changes. Please read the list below.**
