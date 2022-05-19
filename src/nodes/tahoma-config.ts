@@ -3,6 +3,7 @@ import { SomfyApi } from '../core/somfy-api';
 import { HttpResponse } from '../enums/http-response.enum';
 import { TahomaConfigNodeDef } from './tahoma-config.def';
 import { IDevice } from '../interfaces/device';
+import { DiscoveryService } from '../core/discovery';
 
 export = (RED: nodered.NodeAPI): void => {
   RED.nodes.registerType(
@@ -15,6 +16,7 @@ export = (RED: nodered.NodeAPI): void => {
       this['pin'] = props.pin;
       this['name'] = props.name;
       this['token'] = props.token;
+      this['url'] = props.url;
     },
   );
 
@@ -22,13 +24,16 @@ export = (RED: nodered.NodeAPI): void => {
     const { userId, userPassword, tahomaPin } = request.body;
     const token = await SomfyApi.getLocalToken(userId, userPassword, tahomaPin);
 
+    const _discovery = new DiscoveryService();
+    const devices = await _discovery.getDevices(tahomaPin);
+
     if (token === null) {
       response.status(HttpResponse.BAD_REQUEST);
       response.send();
       return;
     }
 
-    response.json({ token });
+    response.json({ token, devices });
   });
 
   RED.httpAdmin.get('/somfy/:account/devices', function (req, res) {

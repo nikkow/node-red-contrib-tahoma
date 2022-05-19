@@ -117,7 +117,7 @@ export class SomfyApi {
   }
 
   private getGatewayUrl(): string {
-    return `https://gateway-${this.configNode['pin']}.local:8443/enduser-mobile-web/1/enduserAPI`;
+    return `${this.configNode['url']}/enduser-mobile-web/1/enduserAPI`;
   }
 
   public getDevice(device: string): Promise<IDevice> {

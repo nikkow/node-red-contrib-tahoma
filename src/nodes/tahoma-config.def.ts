@@ -4,4 +4,5 @@ export interface TahomaConfigNodeDef extends nodered.NodeDef {
   name: string;
   pin: string;
   token: string;
+  url: string;
 }

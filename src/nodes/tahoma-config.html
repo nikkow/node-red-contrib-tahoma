@@ -5,6 +5,7 @@
       connectionname: { required: true },
       pin: { required: true },
       token: { required: true },
+      url: { required: true },
     },
     label: function () {
       return this.connectionname;
@@ -33,6 +34,11 @@
           },
           success: (response) => {
             $('#node-config-input-token').val(response.token);
+            if (response.devices) {
+              $('#node-config-input-url').val(
+                `https://${response.devices.host}:${response.devices.port}`,
+              );
+            }
             $('.hidden-on-ok').hide();
             $('.shown-on-ok').show();
             $('.form-error').hide();
@@ -52,6 +58,7 @@
 </script>
 <script type="text/x-red" data-template-name="tahoma-config">
   <p>In order to properly configure your Tahoma nodes, you need to be enable the <b>Developer Mode</b> on your <a href="https://www.somfy.com" target="_blank">Somfy account</a>. Then, enter your Somfy email and password below to retrieve your Tahoma box. Please note that your credentials are not saved.</p>
+  <p><b>Note:</b> this config node will scan your network to find your Tahoma URL and port. If the field <i>Tahoma URL</i> remains empty, please ensure that the developer mode is enabled and indicate manually the URL of your gateway.</p>
   <div class="form-row">
       <label for="node-config-input-connectionname"><i class="icon-bookmark"></i> Name:</label>
       <input type="text" id="node-config-input-connectionname">
@@ -71,6 +78,10 @@
   <div class="form-row api-credentials shown-on-ok" style="display: none;">
     <label for="node-config-input-token"><i class="icon-bookmark"></i> Token:</label>
     <input type="text" disabled="disabled" id="node-config-input-token">
+  </div>
+  <div class="form-row api-credentials shown-on-ok" style="display: none;">
+    <label for="node-config-input-url"><i class="icon-bookmark"></i> Tahoma URL:</label>
+    <input type="text" id="node-config-input-url" placeholder="example: http://gateway-1234-5678-9123:8765">
   </div>
 
   <div class="form-error" style="border:  1px solid #AD1625;padding:  10px;color:  #AD1625;margin-bottom: 10px; display: none;">An error occurred. Please ensure your credentials and PIN code are correct.</div>
