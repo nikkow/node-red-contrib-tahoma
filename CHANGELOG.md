@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.0-beta.5] - 2022-06-04
+
+---
+
+⚠️ This release is a **beta** release. Use it at your own risk.
+
+---
+
+---
+
+🚨 **This release is a major version and contains some breaking changes. Please read the list below.**
+
+---
+
+### Fixed
+
+- Nothing happened when a `customPosition` command was issued.
+
 ## [3.0.0-beta.4] - 2022-05-19
 
 ---
