@@ -1,6 +1,6 @@
 export interface ICommand {
   name: string;
-  parameters?: ICommandParameter[];
+  parameters?: number[];
 }
 
 export interface ICommandParameter {

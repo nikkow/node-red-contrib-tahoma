@@ -16,8 +16,8 @@ interface ITahomaControlPayload {
 }
 
 interface ITahomaControlInstructions {
-  command: 'open' | 'close' | 'position' | 'rotation' | 'stop';
-  parameters?: Array<{ name: string; value: number | string }>;
+  command: 'open' | 'close' | 'rotation' | 'stop' | 'setClosure';
+  parameters?: number[];
   expectedState?: { open?: boolean; position?: number; orientation?: number };
   labels: {
     done: string;
@@ -74,7 +74,7 @@ export = (RED: nodered.NodeAPI) => {
         if (msg.payload.lowspeed && instructions.command !== 'stop') {
           const targetPosition = instructions.expectedState.position || 0;
           command.name = 'position_low_speed';
-          command.parameters = [{ name: 'position', value: targetPosition }];
+          command.parameters = [targetPosition];
         }
 
         this.status({
@@ -135,7 +135,7 @@ function generateInstructionsFromPayload(
 
     case 'customPosition':
       return {
-        command: 'position',
+        command: 'setClosure',
         expectedState: {
           open: true,
           position: parseInt(payload.position, 10),
@@ -144,9 +144,7 @@ function generateInstructionsFromPayload(
           done: `Set to ${payload.position}`,
           progress: `Setting to ${payload.position}`,
         },
-        parameters: [
-          { name: 'position', value: parseInt(payload.position, 10) },
-        ],
+        parameters: [parseInt(payload.position, 10)],
       };
 
     case 'customRotation':
@@ -157,9 +155,7 @@ function generateInstructionsFromPayload(
           done: `Rotated to ${payload.orientation}`,
           progress: `Rotating to ${payload.orientation}...`,
         },
-        parameters: [
-          { name: 'orientation', value: parseInt(payload.orientation, 10) },
-        ],
+        parameters: [parseInt(payload.orientation, 10)],
       };
 
     case 'stop':
