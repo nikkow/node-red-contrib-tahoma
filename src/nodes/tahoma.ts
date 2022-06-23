@@ -149,7 +149,7 @@ function generateInstructionsFromPayload(
 
     case 'customRotation':
       return {
-        command: 'rotation',
+        command: 'setOrientation',
         expectedState: { orientation: parseInt(payload.orientation, 10) },
         labels: {
           done: `Rotated to ${payload.orientation}`,
