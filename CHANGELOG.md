@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.0] - 2026-03-30
+
+---
+
+🚨 **This release is a major version and contains some breaking changes. Please read the list below.**
+
+---
+
+### Added
+
+- Local test mode for development: `npm run testmode` now prepares an isolated `test/node-red` runtime, links the local plugin, and starts Node-RED.
+- Wizard-based setup flow in the config node for gateway discovery, token entry, and validation.
+
+### Changed
+
+- Switched to the new local API.
+- Switched to the documented Developer Mode flow: token is generated in the TaHoma mobile app and entered manually in the config node.
+- TLS handling now validates certificates with the embedded Somfy/Overkiz root CA instead of disabling certificate validation.
+- Simplified config node UI to focus on gateway discovery/manual address entry and token validation.
+
+### Fixed
+
+- Improved validation diagnostics in Node-RED logs when discovery or validation fails (HTTP status, error code, and message).
+- Added validation fallback for IP-based gateways when certificate hostname does not match, while still enforcing CA trust.
+- Included generated TypeScript declaration files (`.d.ts`) in the published package.
+- Nothing happened when a `customPosition` command was issued.
+
+
 ## [3.0.0-beta.6] - 2026-03-30
 
 ---
