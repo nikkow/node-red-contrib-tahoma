@@ -55,11 +55,17 @@ This software is provided **as-is**. Be careful: your devices can be fully contr
 
 ## Configuration
 
-This node relies on the Local API provided by Somfy, and available on the Tahoma box (from v2 onwards -as per Somfy documentation). 
+This node relies on the Local API provided by Somfy, and available on the Tahoma box. 
 
-You will need to **enable the developer mode** on your Somfy account to use this module. This [guide](https://github.com/nikkow/node-red-contrib-tahoma/wiki/How-to-enable-the-developer-mode%3F) will walk you through this process.
+You will need to **enable the developer mode** on your Somfy account to use this module. This [guide](https://github.com/Somfy-Developer/Somfy-TaHoma-Developer-Mode/blob/main/README.md#getting-started) will walk you through this process.
 
-When creating your first node, you will be asked to provide your e-mail and password used to login to your Somfy account. These will be used to generate a token to interact with your box (they will not be saved at all on your instance). The pin code of your box will also be required. This information is available on your Somfy account.
+When creating your first node:
+
+* generate a token in the TaHoma mobile app Developer Mode menu, then paste it in the config node
+* discover your local gateway IP from mDNS (or set it manually)
+* validate the configuration from the wizard
+
+For TLS, this plugin embeds the Somfy root CA and validates certificates by default.
 
 ## Usage
 

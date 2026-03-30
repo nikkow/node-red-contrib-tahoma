@@ -1,91 +1,413 @@
+<style>
+  .tahoma-wizard-step {
+    display: none;
+  }
+
+  .tahoma-wizard-step.active {
+    display: block;
+  }
+
+  .tahoma-wizard-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+  }
+
+  .tahoma-wizard-status {
+    margin-top: 8px;
+    color: #666;
+    font-size: 12px;
+  }
+
+  .tahoma-wizard-error {
+    border: 1px solid #ad1625;
+    padding: 10px;
+    color: #ad1625;
+    margin-top: 10px;
+    display: none;
+  }
+
+  .tahoma-wizard-success {
+    border: 1px solid #2f855a;
+    padding: 10px;
+    color: #2f855a;
+    margin-top: 10px;
+    display: none;
+  }
+
+  .tahoma-wizard-step .form-row > label {
+    white-space: nowrap;
+  }
+</style>
+
 <script type="text/javascript">
-  RED.nodes.registerType('tahoma-config', {
-    category: 'config',
-    defaults: {
-      connectionname: { required: true },
-      pin: { required: true },
-      token: { required: true },
-      url: { required: true },
-    },
-    label: function () {
-      return this.connectionname;
-    },
-    oneditprepare: function tahomaConfigEditPrepare() {
-      if (this.token) {
-        $('.hidden-on-ok').hide();
-        $('.shown-on-ok').show();
-      } else {
-        $('.hidden-on-ok').show();
-        $('.shown-on-ok').hide();
-      }
+  (function () {
+    const TAHOMA_PORT = 8443;
 
-      const LOGIN_URL =
-        'https://ha101-1.overkiz.com/enduser-mobile-web/enduserAPI/login';
+    function normalizeHost(value) {
+      return (value || '')
+        .trim()
+        .replace(/^https?:\/\//, '')
+        .replace(/\/.*$/, '')
+        .replace(/:\d+$/, '');
+    }
 
-      $('button.api-link').on('click', () => {
-        const pinCode = $('#node-config-input-pin').val();
-        $.ajax({
-          url: `${window.location.protocol}//${window.location.host}${window.location.pathname}somfy/get-token`,
-          method: 'POST',
-          data: {
-            userId: $('#node-config-input-email').val(),
-            userPassword: $('#node-config-input-password').val(),
-            tahomaPin: pinCode,
-          },
-          success: (response) => {
-            $('#node-config-input-token').val(response.token);
-            if (response.devices) {
-              $('#node-config-input-url').val(
-                `https://${response.devices.host}:${response.devices.port}`,
+    function gatewayLabel(gateway) {
+      const gatewayName =
+        gateway && typeof gateway.name === 'string' && gateway.name.length > 0
+          ? gateway.name
+          : 'TaHoma Gateway';
+      return `${gatewayName} (${gateway.host})`;
+    }
+
+    RED.nodes.registerType('tahoma-config', {
+      category: 'config',
+      defaults: {
+        connectionname: { value: '', required: false },
+        host: { value: '', required: true },
+        token: { required: true },
+        url: { value: '', required: false },
+      },
+      label: function () {
+        return this.connectionname || this.host || 'TaHoma Gateway';
+      },
+      oneditprepare: function tahomaConfigEditPrepare() {
+        const state = {
+          currentStep: 1,
+          gateways: [],
+          selectedGateway: null,
+          validated: false,
+        };
+
+        const initialHost = normalizeHost(
+          $('#node-config-input-host').val() || $('#node-config-input-url').val(),
+        );
+        $('#node-config-input-host').val(initialHost);
+
+        const $steps = $('.tahoma-wizard-step');
+        const $stepHint = $('#tahoma-wizard-step-hint');
+        const $error = $('#tahoma-wizard-error');
+        const $success = $('#tahoma-wizard-success');
+        const $nextButton = $('#tahoma-wizard-next');
+        const $prevButton = $('#tahoma-wizard-prev');
+        const $gatewaySelect = $('#tahoma-gateway-select');
+        const $manualHostRow = $('#tahoma-manual-host-row');
+        const $nameRow = $('#tahoma-name-row');
+        const $discoveryStatus = $('#tahoma-discovery-status');
+        const $validationStatus = $('#tahoma-validation-status');
+
+        const updateSummary = () => {
+          $('#tahoma-summary-host').text(
+            normalizeHost($('#node-config-input-host').val()) || '(missing)',
+          );
+          $('#tahoma-summary-name').text(
+            ($('#node-config-input-connectionname').val() || '').trim() ||
+              '(auto)',
+          );
+          $('#tahoma-summary-token').text(
+            ($('#node-config-input-token').val() || '').trim() ? 'Provided' : 'Missing',
+          );
+        };
+
+        const showStep = (step) => {
+          state.currentStep = step;
+          $steps.removeClass('active');
+          $(`.tahoma-wizard-step[data-step='${step}']`).addClass('active');
+          $prevButton.prop('disabled', step === 1);
+          $nextButton.toggle(step < 3);
+          $stepHint.text(`Step ${step} of 3`);
+          updateSummary();
+        };
+
+        const setError = (message) => {
+          $success.hide();
+          if (!message) {
+            $error.hide();
+            return;
+          }
+          $error.text(message).show();
+        };
+
+        const setSuccess = (message) => {
+          if (!message) {
+            $success.hide();
+            return;
+          }
+          $success.text(message).show();
+        };
+
+        const applyGatewaySelection = (index) => {
+          if (index < 0 || index >= state.gateways.length) {
+            state.selectedGateway = null;
+            return;
+          }
+
+          const gateway = state.gateways[index];
+          state.selectedGateway = gateway;
+          $('#node-config-input-host').val(gateway.host || '');
+          if (
+            !($('#node-config-input-connectionname').val() || '').trim() &&
+            gateway.name
+          ) {
+            $('#node-config-input-connectionname').val(gateway.name);
+          }
+          updateSummary();
+        };
+
+        const updateStepOneVisibility = () => {
+          const selected = $gatewaySelect.val();
+          const manualSelected = selected === '__manual__';
+          const hasSelection = selected !== '__none__';
+          $manualHostRow.toggle(manualSelected);
+          $nameRow.toggle(hasSelection);
+        };
+
+        const renderGateways = () => {
+          $gatewaySelect.empty();
+          $gatewaySelect.append(
+            '<option value="__none__" selected="selected">Select discovered gateway or manual input</option>',
+          );
+          $gatewaySelect.append(
+            '<option value="__manual__">Manual IP input</option>',
+          );
+
+          state.gateways.forEach((gateway, index) => {
+            const option = $('<option></option>')
+              .val(String(index))
+              .text(gatewayLabel(gateway));
+            $gatewaySelect.append(option);
+          });
+        };
+
+        $('#discover-gateway').on('click', () => {
+          setError('');
+          setSuccess('');
+          $discoveryStatus.text('Discovery in progress...');
+          $.ajax({
+            url: `${window.location.protocol}//${window.location.host}${window.location.pathname}somfy/discover`,
+            method: 'POST',
+            data: {
+              timeoutMs: 3000,
+            },
+            success: (response) => {
+              state.gateways = Array.isArray(response.gateways)
+                ? response.gateways
+                : [];
+              renderGateways();
+
+              if (state.gateways.length === 0) {
+                $gatewaySelect.val('__manual__');
+                $discoveryStatus.text(
+                  'No TaHoma box discovered. You can still enter the IP manually.',
+                );
+                updateStepOneVisibility();
+                return;
+              }
+
+              $gatewaySelect.val('0');
+              applyGatewaySelection(0);
+              updateStepOneVisibility();
+              $discoveryStatus.text('Discovery completed.');
+            },
+            error: () => {
+              $discoveryStatus.text('');
+              setError(
+                'Unable to discover TaHoma gateways on the local network. You can still enter the IP manually.',
               );
-            }
-            $('.hidden-on-ok').hide();
-            $('.shown-on-ok').show();
-            $('.form-error').hide();
-          },
-          error: () => {
-            $('.form-error').show();
-          },
+            },
+          });
         });
-      });
 
-      $('button.api-credentials-reset').on('click', () => {
-        $('.hidden-on-ok').show();
-        $('.shown-on-ok').hide();
-      });
-    },
-  });
+        $gatewaySelect.on('change', () => {
+          const selected = $gatewaySelect.val();
+          if (selected === '__none__') {
+            state.selectedGateway = null;
+            updateStepOneVisibility();
+            return;
+          }
+          if (selected === '__manual__') {
+            state.selectedGateway = null;
+            updateStepOneVisibility();
+            return;
+          }
+
+          const index = Number(selected);
+          if (!Number.isNaN(index)) {
+            applyGatewaySelection(index);
+          }
+          updateStepOneVisibility();
+        });
+
+        $('#validate-config').on('click', () => {
+          const host = normalizeHost($('#node-config-input-host').val());
+          const token = ($('#node-config-input-token').val() || '').trim();
+
+          setError('');
+          setSuccess('');
+          state.validated = false;
+
+          if (!host) {
+            setError('Gateway address is required before validation.');
+            return;
+          }
+          if (!token) {
+            setError('Token is required before validation.');
+            return;
+          }
+
+          $validationStatus.text('Validating...');
+
+          $.ajax({
+            url: `${window.location.protocol}//${window.location.host}${window.location.pathname}somfy/validate`,
+            method: 'POST',
+            data: {
+              host,
+              token,
+            },
+            success: (response) => {
+              state.validated = true;
+              const gatewayId =
+                response && response.gatewayId
+                  ? ` (gatewayId: ${response.gatewayId})`
+                  : '';
+              $validationStatus.text('Connection validated.');
+              setSuccess(`Validation succeeded${gatewayId}.`);
+            },
+            error: (xhr) => {
+              $validationStatus.text('');
+              const backendMessage =
+                xhr &&
+                xhr.responseJSON &&
+                typeof xhr.responseJSON.error === 'string'
+                  ? xhr.responseJSON.error
+                  : null;
+              setError(
+                backendMessage ||
+                  'Validation failed. Verify the gateway address, token, and that Developer Mode is enabled.',
+              );
+            },
+          });
+        });
+
+        $nextButton.on('click', () => {
+          const host = normalizeHost($('#node-config-input-host').val());
+          const token = ($('#node-config-input-token').val() || '').trim();
+          setError('');
+          setSuccess('');
+
+          if (state.currentStep === 1 && !host) {
+            setError('Gateway address is required before continuing.');
+            return;
+          }
+
+          if (state.currentStep === 2 && !token) {
+            setError('Token is required before continuing.');
+            return;
+          }
+
+          showStep(state.currentStep + 1);
+        });
+
+        $prevButton.on('click', () => {
+          setError('');
+          setSuccess('');
+          if (state.currentStep > 1) {
+            showStep(state.currentStep - 1);
+          }
+        });
+
+        renderGateways();
+        if (initialHost) {
+          $gatewaySelect.val('__manual__');
+        } else {
+          $gatewaySelect.val('__none__');
+        }
+        updateStepOneVisibility();
+        showStep(1);
+      },
+      oneditsave: function onSaveConfig() {
+        const host = normalizeHost($('#node-config-input-host').val());
+        const currentName = ($('#node-config-input-connectionname').val() || '').trim();
+        if (!currentName && host) {
+          $('#node-config-input-connectionname').val(host);
+        }
+
+        $('#node-config-input-host').val(host);
+        $('#node-config-input-url').val(
+          host ? `https://${host}:${TAHOMA_PORT}` : '',
+        );
+      },
+    });
+  })();
 </script>
+
 <script type="text/x-red" data-template-name="tahoma-config">
-  <p>In order to properly configure your Tahoma nodes, you need to be enable the <b>Developer Mode</b> on your <a href="https://www.somfy.com" target="_blank">Somfy account</a>. Then, enter your Somfy email and password below to retrieve your Tahoma box. Please note that your credentials are not saved.</p>
-  <p><b>Note:</b> this config node will scan your network to find your Tahoma URL and port. If the field <i>Tahoma URL</i> remains empty, please ensure that the developer mode is enabled and indicate manually the URL of your gateway.</p>
   <div class="form-row">
+    <strong>TaHoma Setup Wizard</strong>
+    <div id="tahoma-wizard-step-hint" class="tahoma-wizard-status"></div>
+  </div>
+
+  <div class="tahoma-wizard-step active" data-step="1">
+    <p><b>Step 1:</b> Discover your TaHoma gateway address on the local network.</p>
+    <div class="form-row">
+      <button type="button" id="discover-gateway">Discover TaHoma Box</button>
+      <div id="tahoma-discovery-status" class="tahoma-wizard-status"></div>
+    </div>
+    <div class="form-row">
+      <label for="tahoma-gateway-select"><i class="icon-bookmark"></i> Discovered:</label>
+      <select id="tahoma-gateway-select" style="width: 70%"></select>
+    </div>
+    <div class="form-row" id="tahoma-manual-host-row" style="display: none;">
+      <label for="node-config-input-host"><i class="icon-bookmark"></i> Gateway address:</label>
+      <input type="text" id="node-config-input-host" placeholder="example: gateway-2001-1234-5678.local">
+    </div>
+    <div class="form-row" id="tahoma-name-row" style="display: none;">
       <label for="node-config-input-connectionname"><i class="icon-bookmark"></i> Name:</label>
-      <input type="text" id="node-config-input-connectionname">
-  </div>
-  <div class="form-row api-credentials">
-    <label for="node-config-input-apikey"><i class="icon-bookmark"></i> PIN:</label>
-    <input type="text" id="node-config-input-pin">
-  </div>
-  <div class="form-row api-credentials hidden-on-ok">
-      <label for="node-config-input-apikey"><i class="icon-bookmark"></i> Email:</label>
-      <input type="text" id="node-config-input-email">
-  </div>
-  <div class="form-row api-credentials hidden-on-ok">
-      <label for="node-config-input-apisecret"><i class="icon-bookmark"></i> Password:</label>
-      <input type="password" id="node-config-input-password">
-  </div>
-  <div class="form-row api-credentials shown-on-ok" style="display: none;">
-    <label for="node-config-input-token"><i class="icon-bookmark"></i> Token:</label>
-    <input type="text" disabled="disabled" id="node-config-input-token">
-  </div>
-  <div class="form-row api-credentials shown-on-ok" style="display: none;">
-    <label for="node-config-input-url"><i class="icon-bookmark"></i> Tahoma URL:</label>
-    <input type="text" id="node-config-input-url" placeholder="example: http://gateway-1234-5678-9123:8765">
+      <input type="text" id="node-config-input-connectionname" placeholder="autofilled from discovered box name if empty">
+    </div>
   </div>
 
-  <div class="form-error" style="border:  1px solid #AD1625;padding:  10px;color:  #AD1625;margin-bottom: 10px; display: none;">An error occurred. Please ensure your credentials and PIN code are correct.</div>
+  <div class="tahoma-wizard-step" data-step="2">
+    <p><b>Step 2:</b> Create a local token from the TaHoma mobile app Developer Mode.</p>
+    <ol>
+      <li>Open the <b>TaHoma by Somfy</b> mobile app.</li>
+      <li>Go to your box parameters and enable <b>Developer Mode</b> (tap the gateway PIN 7 times).</li>
+      <li>Generate a token in the Developer Mode menu.</li>
+      <li>Copy the token now (it is shown only at creation time), then paste it below.</li>
+    </ol>
+    <div class="form-row">
+      <label for="node-config-input-token"><i class="icon-bookmark"></i> Token:</label>
+      <input type="text" id="node-config-input-token">
+    </div>
+  </div>
 
-  <button class="api-credentials api-link hidden-on-ok">Create Connection</button>
-  <button class="api-credentials-reset shown-on-ok">Generate new token</button>
+  <div class="tahoma-wizard-step" data-step="3">
+    <p><b>Step 3:</b> Validate your configuration.</p>
+    <div class="form-row">
+      <label>Gateway address:</label>
+      <span id="tahoma-summary-host"></span>
+    </div>
+    <div class="form-row">
+      <label>Name:</label>
+      <span id="tahoma-summary-name"></span>
+    </div>
+    <div class="form-row">
+      <label>Token:</label>
+      <span id="tahoma-summary-token"></span>
+    </div>
+    <div class="form-row">
+      <button type="button" id="validate-config">Validate</button>
+      <div id="tahoma-validation-status" class="tahoma-wizard-status"></div>
+    </div>
+  </div>
+
+  <div id="tahoma-wizard-error" class="tahoma-wizard-error"></div>
+  <div id="tahoma-wizard-success" class="tahoma-wizard-success"></div>
+
+  <div class="tahoma-wizard-nav">
+    <button type="button" id="tahoma-wizard-prev">Previous</button>
+    <button type="button" id="tahoma-wizard-next">Next</button>
+  </div>
+
+  <input type="hidden" id="node-config-input-url">
 </script>
