@@ -1,4 +1,10 @@
-import axios, { AxiosRequestConfig, AxiosResponse, AxiosInstance } from 'axios';
+import axios, {
+  AxiosHeaders,
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
+} from 'axios';
 import { ICommand } from '../interfaces/command';
 import { IDevice } from '../interfaces/device';
 import { ICommandExecutionResponse } from '../interfaces/command-execution-response';
@@ -95,8 +101,9 @@ export class SomfyApi {
     this.configNode = configNode;
 
     this.axiosInstance.interceptors.request.use(
-      (request: AxiosRequestConfig) => {
-        request.headers['Authorization'] = `Bearer ${this.getAccessToken()}`;
+      (request: InternalAxiosRequestConfig) => {
+        request.headers = AxiosHeaders.from(request.headers);
+        request.headers.set('Authorization', `Bearer ${this.getAccessToken()}`);
         return request;
       },
     );
