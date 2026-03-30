@@ -6,7 +6,11 @@
   "scripts": {
     "build": "mkdir -p dist/nodes/ && cp -a src/nodes/*.html dist/nodes/ && tsc",
     "execute": "npm run build && node-red",
-    "lint": "eslint src/**/*.ts"
+    "lint": "eslint src/**/*.ts",
+    "testmode:prepare": "node scripts/testmode-prepare.js",
+    "testmode:start": "node scripts/testmode-start.js",
+    "testmode": "npm run build && npm run testmode:prepare && npm run testmode:start",
+    "testmode:watch": "npm run testmode:prepare && nodemon --config nodemon.testmode.json"
   },
   "repository": {
     "type": "git",
@@ -46,6 +50,8 @@
     "eslint": "10.1.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-prettier": "5.5.5",
+    "node-red": "^4.0.0",
+    "nodemon": "^3.1.11",
     "prettier": "3.8.1",
     "typescript": "5.9.3"
   }

@@ -32,6 +32,24 @@ You can read this [guide](https://nodered.org/docs/getting-started/adding-nodes)
 	cd $HOME/.node-red
 	npm install node-red-contrib-tahoma 
 
+## Development Test Mode
+
+For local development, you can run an isolated Node-RED instance automatically linked to this plugin:
+
+	npm install
+	npm run testmode
+
+This command will:
+
+* build the plugin
+* prepare an isolated user directory in `test/node-red`
+* symlink `node-red-contrib-tahoma` into that runtime
+* start Node-RED on port `1880` (override with `NODE_RED_PORT`)
+
+For auto-rebuild and auto-restart while editing:
+
+	npm run testmode:watch
+
 ## Disclaimer
 This software is provided **as-is**. Be careful: your devices can be fully controlled via API actions. I am not responsible of any mis-usage or corruption of the devices configuration.
 

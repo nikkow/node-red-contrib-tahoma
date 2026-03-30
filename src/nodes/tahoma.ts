@@ -16,7 +16,7 @@ interface ITahomaControlPayload {
 }
 
 interface ITahomaControlInstructions {
-  command: 'open' | 'close' | 'rotation' | 'stop' | 'setClosure';
+  command: 'open' | 'close' | 'rotation' | 'stop' | 'setClosure' | 'setOrientation';
   parameters?: number[];
   expectedState?: { open?: boolean; position?: number; orientation?: number };
   labels: {

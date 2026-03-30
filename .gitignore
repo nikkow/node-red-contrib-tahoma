@@ -144,3 +144,14 @@ $RECYCLE.BIN/
 # Misc 
 .vscode
 dist
+test/node-red/.config.runtime.json
+test/node-red/.config.runtime.json.backup
+test/node-red/.sessions.json
+test/node-red/.sessions.json.backup
+test/node-red/context/
+test/node-red/lib/
+test/node-red/logs/
+test/node-red/flows*.json
+test/node-red/node_modules/
+test/node-red/package-lock.json
+test/node-red/
