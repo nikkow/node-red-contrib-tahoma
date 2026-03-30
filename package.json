@@ -2,9 +2,16 @@
   "name": "node-red-contrib-tahoma",
   "version": "3.0.0-beta.5",
   "description": "Control a Somfy Tahoma box from Node RED",
-  "main": "index.js",
+  "main": "dist/nodes/tahoma.js",
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "build": "mkdir -p dist/nodes/ && cp -a src/nodes/*.html dist/nodes/ && tsc",
+    "prepack": "npm run build",
     "execute": "npm run build && node-red",
     "lint": "eslint src/**/*.ts",
     "testmode:prepare": "node scripts/testmode-prepare.js",
