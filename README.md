@@ -6,7 +6,7 @@
 
 
 [![npm](https://img.shields.io/npm/v/node-red-contrib-tahoma.svg)](https://www.npmjs.com/package/node-red-contrib-tahoma)
-[![Build Status](https://travis-ci.org/nikkow/node-red-contrib-tahoma.svg?branch=develop-v2)](https://travis-ci.org/nikkow/node-red-contrib-tahoma)
+[![Build and Lint](https://github.com/nikkow/node-red-contrib-tahoma/actions/workflows/build.yml/badge.svg)](https://github.com/nikkow/node-red-contrib-tahoma/actions/workflows/build.yml)
 [![npm](https://img.shields.io/npm/dt/node-red-contrib-tahoma.svg)](https://www.npmjs.com/package/node-red-contrib-tahoma)
 ![license](https://img.shields.io/github/license/nikkow/node-red-contrib-tahoma.svg)
 ![code size](https://img.shields.io/github/languages/code-size/nikkow/node-red-contrib-tahoma)
